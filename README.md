@@ -3,11 +3,13 @@
 # Why?
 Videos on Youtube get deleted, unlisted, and blocked. That's bad in itself, but the other problem is that if you saved the video in a playlist, it will just display *\[Deleted video\]* or something like this instead of title. No channel name. No thumbnail. Not even video length. You can only guess what was that video. I made a little script that allows to take "snapshots" of playlists and save them on local drive. With that, if a video gets deleted, you can still find or at least search for it on other streaming services, or perhaps also on Youtube (reupload).
 
+Why not just save whole pages straight from Youtube? It's much slower and space inefficient, as you have to download everything, including scripts. Also the thumbnails are small.
+
 Note: this works only with old Youtube UI. Enable it by adding *disable_polymer=true* param to Youtube url, or by installing a browser extension that does that automatically.
 
 # How to use
 * First go to https://github.com/szycikm/ytPlaylistSnapshot/blob/master/ytPlaylistSnapshot.js and copy all the code to clipboard
-* Create a new bookmark in your internet browser. Name it how you want, and paste the code you copied in the address field
+* Create a new bookmark in your internet browser. Name it how you want, and paste the code you copied in the address field (newlines should get removed automatically)
 * Open a playlist (NOT a video that's in a playlist, but the playlist itself)
 * If the playlist is longer than 100 videos, scroll down and press "see more" until all videos are revealed
 * Click on the bookmark you created before
