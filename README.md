@@ -20,6 +20,7 @@ Note: this works only with old Youtube UI. Enable it by adding *disable_polymer=
 
 ## How to use ##
 * Go to https://github.com/szycikm/ytUtils/blob/master/ytPlaylistSnapshot.js and copy all the code to clipboard
+    * Alternatively download https://github.com/szycikm/ytUtils/blob/master/ytPlaylistSnapshotCsv.js if you want .csv output
 * Create a new bookmark in your internet browser. Name it how you want, and paste the code you copied in the address field (newlines should get removed automatically)
 * Open a playlist (NOT a video that's in a playlist, but the playlist itself)
 * If the playlist is longer than 100 videos, scroll down and press "see more" until all videos are revealed
