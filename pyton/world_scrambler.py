@@ -19,6 +19,8 @@ def find_matches(letters, desired):
 
 if len(sys.argv) < 3:
 	print("too few arguments")
+	print("arg1 = letters that you have")
+	print("arg2 = words that you want to make")
 	exit()
 
 if find_matches(sys.argv[1], sys.argv[2]):
