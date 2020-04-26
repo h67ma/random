@@ -38,6 +38,9 @@ def process_and_split_md(base_dir, in_md):
 					.replace("\n\n\u00A0\n\n\u00A0", "") \
 					.replace("\u00A0", "")
 
+				# fix image paths (add slash at the beginning)
+				nice_content = re.sub(r"!\[([^\]]*)\]\((media\/[^\)]+)\)", r"![\1](/\2)", nice_content)
+
 				with open(nice_filename, "w", encoding="utf-8") as file:
 					# add title and creation time at the top
 					file.write("# %s\n\nCreated %s %s\n- - -\n%s" % (meta[i][0], meta[i][1], meta[i][2], nice_content))
@@ -56,8 +59,9 @@ for notebook in os.listdir(root_path):
 	if os.path.isdir("%s/%s" % (root_path, notebook)):
 		for section_docx in glob.glob("%s/%s/*.docx" % (root_path, notebook)):
 			section_dirname = section_docx[:-5]
+			section_name = re.split(r"[\\/]", section_dirname)[-1]
 			os.mkdir(section_dirname)
-			docx_to_md(pandoc_bin, "", section_docx, tmp_md)
+			docx_to_md(pandoc_bin, "media/" + section_name, section_docx, tmp_md)
 			process_and_split_md(section_dirname, tmp_md)
 
 os.remove(tmp_md)
