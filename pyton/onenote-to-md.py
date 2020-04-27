@@ -24,11 +24,12 @@ def process_and_split_md(base_dir, in_md):
 			print("a horrible chill goes down your spine... len(meta) = %d, len(pages) = %d" % (len(meta), len(pages)))
 		else:
 			for i in range(len(meta)):
-				nice_filename = "%s/%s.md" % (base_dir, re.sub(r"[^a-zA-Z0-9_\- ]", "", meta[i][0]).lower())
+				nice_filename = "%s/%s.md" % (base_dir, re.sub(r"[\\/:\"*?<>|]+", "", meta[i][0]))
 
 				# fix weird bullet lists
 				# remove newlines before bullet list items (levels 1, 2, 3)
 				# remove nbsp bs at the end of each section and nbsp in general
+				# fix checklists
 				nice_content = pages[i] \
                     .replace("  - > ", "* ") \
                     .replace("    ", "\t") \
@@ -36,14 +37,13 @@ def process_and_split_md(base_dir, in_md):
 					.replace("\t\n\t* ", "\t* ") \
 					.replace("\t\t\n\t\t* ", "\t\t* ") \
 					.replace("\n\n\u00A0\n\n\u00A0", "") \
-					.replace("\u00A0", "")
-
-				# fix image paths (add slash at the beginning)
-				nice_content = re.sub(r"!\[([^\]]*)\]\((media\/[^\)]+)\)", r"![\1](/\2)", nice_content)
+					.replace("\u00A0", "") \
+					.replace("> \n> ", "* [ ] ") \
+					.replace("> ", "* [ ] ")
 
 				with open(nice_filename, "w", encoding="utf-8") as file:
 					# add title and creation time at the top
-					file.write("# %s\n\nCreated %s %s\n- - -\n%s" % (meta[i][0], meta[i][1], meta[i][2], nice_content))
+					file.write("# %s\n\nCreated: %s %s\n\n---\n%s" % (meta[i][0], meta[i][1], meta[i][2], nice_content))
 
 if len(sys.argv) < 3:
 	print("too few arguments")
@@ -61,10 +61,9 @@ for notebook in os.listdir(root_path):
 			section_dirname = section_docx[:-5]
 			section_name = re.split(r"[\\/]", section_dirname)[-1]
 			os.mkdir(section_dirname)
-			docx_to_md(pandoc_bin, "media/" + section_name, section_docx, tmp_md)
+			docx_to_md(pandoc_bin, ".media", section_docx, tmp_md)
 			process_and_split_md(section_dirname, tmp_md)
+			if os.path.isdir(".media"): # maybe no media was found in the section so the dir wasn't generated
+				shutil.move(".media", section_dirname + "/.media") # move the media dir to target dir
 
 os.remove(tmp_md)
-
-# move the media dir to target dir
-shutil.move("media", root_path + "/media")
