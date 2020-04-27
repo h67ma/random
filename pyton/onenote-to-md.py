@@ -1,3 +1,5 @@
+# verified to work on windows with pandoc-2.9.2.1
+
 import os
 import re
 import sys
@@ -39,7 +41,7 @@ def process_and_split_md(base_dir, in_md):
 					.replace("\n\n\u00A0\n\n\u00A0", "") \
 					.replace("\u00A0", "") \
 					.replace("> \n> ", "* [ ] ") \
-					.replace("> ", "* [ ] ")
+					.replace("\n> ", "\n* [ ] ")
 
 				with open(nice_filename, "w", encoding="utf-8") as file:
 					# add title and creation time at the top
