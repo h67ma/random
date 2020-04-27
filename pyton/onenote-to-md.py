@@ -33,8 +33,8 @@ def process_and_split_md(base_dir, in_md):
 				# remove nbsp bs at the end of each section and nbsp in general
 				# fix checklists
 				nice_content = pages[i] \
-                    .replace("  - > ", "* ") \
-                    .replace("    ", "\t") \
+					.replace("  - > ", "* ") \
+					.replace("    ", "\t") \
 					.replace("\n* ", "* ") \
 					.replace("\t\n\t* ", "\t* ") \
 					.replace("\t\t\n\t\t* ", "\t\t* ") \
