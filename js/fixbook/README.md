@@ -6,7 +6,7 @@ Removes all html elements except chat windows and the blue bar on top, and exten
 Now with dark theme (wow!).
 
 # How to use?
-* [Go to this link](https://raw.githubusercontent.com/szycikm/fixbook/master/fixbook.js) ([or this for normal colors](https://raw.githubusercontent.com/szycikm/fixbook/master/fixbook_origcolors.js)) and copy all text
+* Open fixbook.js or fixbook_origcolors.js and copy all text
 * Add a new bookmark in your browser (on bookmark bar)
 * Paste the text in the URL field and give the bookmark a name
 * Click the bookmark every time you open FB and all ads and stuff are loaded
