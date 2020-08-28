@@ -16,22 +16,45 @@ with open(sys.argv[2], "r") as f_lyrics:
 		i = 0
 		errors = 0
 		for line in f_lyrics:
+			line = line.strip()
 			i += 1
-			matches = re.findall(r"\[(\d{2}):(\d{2})\.(\d{2})\]([^-]+) - ([^\n]+)\n", line)
-			if len(matches) < 1:
-				# first try to find a version with hours:
-				matches = re.findall(r"\[(\d+):(\d+):(\d+)\.(\d+)\]([^-]+) - ([^\n]+)\n", line)
-				if len(matches) < 1:
-					print("can't parse line %d: %s" % (i, line), end='')
+			matches = re.findall(r"^\[(\d{2}):(\d{2})\.(\d{2})\]", line)
+			if len(matches) == 1:
+				matches = matches[0]
+				hh = int(matches[0])
+				mm = int(matches[1])
+				ss = int(matches[2])
+			else:
+				# fallback to version with hours:
+				matches = re.findall(r"^\[(\d+):(\d+):(\d+)\.(\d+)\]", line)
+				if len(matches) == 1:
+					matches = matches[0]
+					hh = int(matches[0]) * 60 + int(matches[1])
+					mm = int(matches[2])
+					ss = int(matches[3])
+				else:
+					print("can't find timestamp in line %d: %s" % (i, line))
 					f_cue.write("  TRACK %02d AUDIO\n    PERFORMER FIXME\n    TITLE FIXME\n    INDEX 01 00:00:00\n" % i)
 					errors += 1
 					continue
+
+			matches = re.findall(r"^\[[^\]]+\]([^-]+) - (.+)$", line)
+			if len(matches) == 1:
 				matches = matches[0]
-				f_cue.write("  TRACK %02d AUDIO\n    PERFORMER %s\n    TITLE %s\n    INDEX 01 %02d:%02d:%02d\n" \
-					% (i, matches[4], matches[5], int(matches[0]) * 60 + int(matches[1]), int(matches[2]), int(matches[3])))
-				continue
-			matches = matches[0]
-			f_cue.write("  TRACK %02d AUDIO\n    PERFORMER %s\n    TITLE %s\n    INDEX 01 %02d:%02d:%02d\n" \
-				% (i, matches[3], matches[4], int(matches[0]), int(matches[1]), int(matches[2])))
+				artist_line = "\n    PERFORMER %s" % matches[0]
+				title = matches[1]
+			else:
+				# try version without "-"
+				matches = re.findall(r"^\[[^\]]+\](.+)$", line)
+				if len(matches) == 1:
+					artist_line = ""
+					title = matches[0] # so it turns out that when group cnt==1 then it's different :()
+				else:
+					print("can't find trak info in line %d: %s" % (i, line))
+					f_cue.write("  TRACK %02d AUDIO\n    PERFORMER FIXME\n    TITLE FIXME\n    INDEX 01 %02d:%02d:%02d\n" % (i, hh, mm, ss))
+					errors += 1
+					continue
+
+			f_cue.write("  TRACK %02d AUDIO%s\n    TITLE %s\n    INDEX 01 %02d:%02d:%02d\n" % (i, artist_line, title, hh, mm, ss))
 		if errors > 0:
 			print("completed with %d errors, pls fix cuesheet manually" % errors)
