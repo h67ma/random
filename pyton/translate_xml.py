@@ -1,5 +1,5 @@
 import sys
-from googletrans import Translator
+from googletrans import Translator, LANGCODES
 import xml.etree.ElementTree as ET
 from httpx import Timeout
 import time
@@ -18,13 +18,14 @@ def translate_xml(node):
 				break
 			except Exception as ex:
 				print(ex)
-				print("can't translate: ", in_text)
+				print("can't translate:", in_text)
 				print("retrying...")
 				time.sleep(5)
 
 
 if len(sys.argv) < 5:
-	print("args:\n* input xml filename\n* output xml filename\n* input language code (e.g. en, ru)\n* output language code (e.g. es, de)")
+	print("args:\n* input xml filename\n* output xml filename\n* input language code \n* output language code\nlanguage codes:")
+	print(LANGCODES)
 	exit()
 
 in_filename = sys.argv[1]
