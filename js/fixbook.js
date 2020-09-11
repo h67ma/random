@@ -3,7 +3,7 @@ javascript:
 	/* change title */
 	document.title = "Fakelook";
 
-	var cssPlzMakeMyChatReasonablySized = "div[role='region'] { height: 3000px !important; }";
+	var cssPlzMakeMyChatReasonablySized = "div[role='region'] { height: 3000px !important; width: 400px !important; }";
 
 	/* add custom styles */
 	var styleNode = document.createElement("style");
