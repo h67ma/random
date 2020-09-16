@@ -178,9 +178,9 @@ output_video_frame.grid(row=2, column=0, sticky=N+E+W+S, padx=(0, 10))
 
 inside_video_output = Frame(output_video_frame)
 
-Radiobutton(inside_video_output, text="Don't touch", variable=video_output, value=0).pack(expand=True, fill="both")
-Radiobutton(inside_video_output, text="-vn", variable=video_output, value=1).pack(expand=True, fill="both")
-Radiobutton(inside_video_output, text="-vcodec copy", variable=video_output, value=2).pack(expand=True, fill="both")
+Radiobutton(inside_video_output, text="Default", variable=video_output, value=0).pack(expand=True, fill="both")
+Radiobutton(inside_video_output, text="Disabled", variable=video_output, value=1).pack(expand=True, fill="both")
+Radiobutton(inside_video_output, text="Copy", variable=video_output, value=2).pack(expand=True, fill="both")
 
 inside_video_output.pack()
 
@@ -190,9 +190,9 @@ output_audio_frame.grid(row=2, column=1, sticky=N+E+W+S, padx=(0, 10))
 
 inside_audio_output = Frame(output_audio_frame)
 
-Radiobutton(inside_audio_output, text="Don't touch", variable=audio_output, value=0).pack(expand=True, fill="both")
-Radiobutton(inside_audio_output, text="-an", variable=audio_output, value=1).pack(expand=True, fill="both")
-Radiobutton(inside_audio_output, text="-acodec copy", variable=audio_output, value=2).pack(expand=True, fill="both")
+Radiobutton(inside_audio_output, text="Default", variable=audio_output, value=0).pack(expand=True, fill="both")
+Radiobutton(inside_audio_output, text="Disabled", variable=audio_output, value=1).pack(expand=True, fill="both")
+Radiobutton(inside_audio_output, text="Copy", variable=audio_output, value=2).pack(expand=True, fill="both")
 
 inside_audio_output.pack()
 
