@@ -3,12 +3,14 @@ javascript:
 	/* change title */
 	document.title = "Fakelook";
 
-	var cssPlzMakeMyChatReasonablySized = "div[role='region'] { height: 3000px !important; width: 400px !important; }";
+	/* bigger chats, hide annoying chat baloon notifications */
+	var customCss = `div[role='region'] { height: 3000px !important; width: 400px !important; }
+	div[data-pagelet='root'] > div:first-child > div:nth-child(8) > div:last-child { display: none !important; }`;
 
 	/* add custom styles */
 	var styleNode = document.createElement("style");
 	styleNode.type = "text/css";
-	styleNode.appendChild(document.createTextNode(cssPlzMakeMyChatReasonablySized));
+	styleNode.appendChild(document.createTextNode(customCss));
 	document.head.appendChild(styleNode);
 
 	/* remove useless stuff */
