@@ -85,6 +85,7 @@ inside_in_out.columnconfigure(2, pad=10)
 
 inside_in_out.rowconfigure(0, pad=10)
 inside_in_out.rowconfigure(1, pad=10)
+inside_in_out.rowconfigure(2, pad=10)
 
 Label(inside_in_out, text="In:").grid(row=0, column=0, sticky=W)
 
@@ -105,6 +106,8 @@ out_lbl_f.grid(row=1, column=1, sticky=N+E+W+S)
 
 select_out_btn = Button(inside_in_out, text="Select")
 select_out_btn.grid(row=1, column=2, sticky=N+E+W+S)
+
+Label(inside_in_out, text="Note: urls (blobs) also work").grid(row=2, column=0, columnspan=3, sticky=N+E+W+S)
 
 inside_in_out.pack(expand=True, fill="both")
 
