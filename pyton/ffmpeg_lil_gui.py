@@ -2,6 +2,7 @@ import os
 import threading
 from tkinter import Tk, StringVar, IntVar, Text, filedialog, N, E, W, S, CENTER, LEFT, RIGHT, INSERT, WORD, END
 from tkinter.ttk import Frame, LabelFrame, Label, Button, Checkbutton, Entry, Radiobutton, Scrollbar
+from tkinterdnd2 import TkinterDnD, DND_FILES
 
 def float_get_after_decimal(val):
 	return int(str(val - int(val))[2:]) # this is so bad, but it works
@@ -16,12 +17,23 @@ def sms_to_hmsms(s):
 	out_s = int(s % 60)
 	return out_h, out_m, out_s
 
-root = Tk()
+root = TkinterDnD.Tk()
 root.title("lil ffmpeg helper")
 
 # data
-in_txt = StringVar(value="<nothing>")
-out_txt = StringVar(value="<nothing>")
+in_txt = StringVar()
+out_txt = StringVar()
+
+def strip_mustache(string):
+	if string[0] == "{" and string[-1] == "}":
+		return string[1:-1]
+	return string
+
+def drop_in(event):
+	in_txt.set(strip_mustache(event.data))
+
+def drop_out(event):
+	out_txt.set(strip_mustache(event.data))
 
 trim_video = IntVar(value=0)
 x_txt = IntVar(value=0)
@@ -77,6 +89,8 @@ inside_in_out.rowconfigure(1, pad=10)
 Label(inside_in_out, text="In:").grid(row=0, column=0, sticky=W)
 
 in_lbl_f = Entry(inside_in_out, width=60, textvariable=in_txt)
+in_lbl_f.drop_target_register(DND_FILES)
+in_lbl_f.dnd_bind("<<Drop>>", drop_in)
 in_lbl_f.grid(row=0, column=1, sticky=N+E+W+S)
 
 select_in_btn = Button(inside_in_out, text="Select")
@@ -85,6 +99,8 @@ select_in_btn.grid(row=0, column=2, sticky=N+E+W+S)
 Label(inside_in_out, text="Out:").grid(row=1, column=0, sticky=W)
 
 out_lbl_f = Entry(inside_in_out, width=60, textvariable=out_txt)
+out_lbl_f.drop_target_register(DND_FILES)
+out_lbl_f.dnd_bind("<<Drop>>", drop_out)
 out_lbl_f.grid(row=1, column=1, sticky=N+E+W+S)
 
 select_out_btn = Button(inside_in_out, text="Select")
