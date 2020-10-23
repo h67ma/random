@@ -20,8 +20,8 @@ root = Tk()
 root.title("lil ffmpeg helper")
 
 # data
-in_txt = StringVar()
-out_txt = StringVar()
+in_txt = StringVar(value="<nothing>")
+out_txt = StringVar(value="<nothing>")
 
 trim_video = IntVar(value=0)
 x_txt = IntVar(value=0)
@@ -76,16 +76,16 @@ inside_in_out.rowconfigure(1, pad=10)
 
 Label(inside_in_out, text="In:").grid(row=0, column=0, sticky=W)
 
-in_lbl_f = Label(inside_in_out, text="<nothing>")
-in_lbl_f.grid(row=0, column=1, sticky=W)
+in_lbl_f = Entry(inside_in_out, width=60, textvariable=in_txt)
+in_lbl_f.grid(row=0, column=1, sticky=N+E+W+S)
 
 select_in_btn = Button(inside_in_out, text="Select")
 select_in_btn.grid(row=0, column=2, sticky=N+E+W+S)
 
 Label(inside_in_out, text="Out:").grid(row=1, column=0, sticky=W)
 
-out_lbl_f = Label(inside_in_out, text="<nothing>")
-out_lbl_f.grid(row=1, column=1, sticky=W)
+out_lbl_f = Entry(inside_in_out, width=60, textvariable=out_txt)
+out_lbl_f.grid(row=1, column=1, sticky=N+E+W+S)
 
 select_out_btn = Button(inside_in_out, text="Select")
 select_out_btn.grid(row=1, column=2, sticky=N+E+W+S)
@@ -254,7 +254,6 @@ def select_input_file():
 		update_status("Invalid file")
 		return
 	in_txt.set(value=filename)
-	in_lbl_f.configure(text=filename)
 
 	vid_data = os.popen("ffprobe -v error -select_streams v:0 -show_entries stream=width,height,duration -of csv=s=,:p=0 \"%s\"" % filename)
 	vid_data = vid_data.read().split(',')
@@ -279,7 +278,6 @@ def select_output_file():
 		update_status("Invalid file")
 		return
 	out_txt.set(value=filename)
-	out_lbl_f.configure(text=filename)
 	update_command()
 	update_status("Rdy")
 
@@ -342,6 +340,9 @@ select_in_btn.configure(command=select_input_file)
 select_out_btn.configure(command=select_output_file)
 
 enable_video_trim.configure(command=update_command)
+in_txt.trace("w", lambda *a: update_command())
+out_txt.trace("w", lambda *a: update_command())
+
 x_txt.trace("w", lambda *a: update_command())
 y_txt.trace("w", lambda *a: update_command())
 w_txt.trace("w", lambda *a: update_command())
