@@ -1,5 +1,6 @@
 import os
 import threading
+import subprocess
 from tkinter import Tk, StringVar, IntVar, Text, filedialog, N, E, W, S, CENTER, LEFT, RIGHT, INSERT, WORD, END
 from tkinter.ttk import Frame, LabelFrame, Label, Button, Checkbutton, Entry, Radiobutton, Scrollbar
 from tkinterdnd2 import TkinterDnD, DND_FILES
@@ -221,7 +222,7 @@ output_options_frame.grid(row=2, column=2, sticky=N+E+W+S)
 
 inside_output_options = Frame(output_options_frame)
 
-gif_checkbox = Checkbutton(inside_output_options, text="Gif", variable=gif)
+gif_checkbox = Checkbutton(inside_output_options, text="gif", variable=gif)
 gif_checkbox.pack(expand=True, fill="both")
 
 strict2_checkbox = Checkbutton(inside_output_options, text="-strict -2", variable=strict2)
@@ -302,10 +303,13 @@ def select_output_file():
 
 
 def run_ffmpeg_thread(command):
-	os.system(command)
-	update_status("Done")
+	result = os.system(command)
+	if result == 0:
+		update_status("Success")
+	else:
+		update_status("ffmpeg finished with errors, check console")
 	if open_after_done.get() == 1:
-		os.system("\"%s\"" % out_txt.get())
+		subprocess.call("\"%s\"" % out_txt.get(), shell=True)
 
 
 def update_command():
