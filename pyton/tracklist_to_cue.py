@@ -3,6 +3,7 @@ import re
 from tkinter import StringVar, N, E, W, S, WORD, LEFT, RIGHT, Text, filedialog, END, INSERT
 from tkinter.ttk import Frame, LabelFrame, Label, Entry, Scrollbar, Button
 from tkinterdnd2 import TkinterDnD, DND_FILES
+from cue_extractors import extract_hh_mm_ss_ms, extract_mm_ss_ms, extract_title, extract_title_artist
 
 
 root = TkinterDnD.Tk()
@@ -43,6 +44,8 @@ def drop_file(event):
 
 
 def translate_to_cue():
+	time_extractors = [extract_hh_mm_ss_ms, extract_mm_ss_ms]
+	title_extractors = [extract_title_artist, extract_title]
 	tracklist = in_tracklist_box.get("1.0", END).split('\n')
 	track_name = in_track_name_txt.get()
 
@@ -63,44 +66,39 @@ def translate_to_cue():
 		if line == "":
 			continue
 		i += 1
-		matches = re.findall(r"^\[(\d{2}):(\d{2})\.(\d{2})\]", line)
-		if len(matches) == 1:
-			matches = matches[0]
-			hh = int(matches[0])
-			mm = int(matches[1])
-			ss = int(matches[2])
-		else:
-			# fallback to version with hours:
-			matches = re.findall(r"^\[(\d+):(\d+):(\d+)\.(\d+)\]", line)
-			if len(matches) == 1:
-				matches = matches[0]
-				hh = int(matches[0]) * 60 + int(matches[1])
-				mm = int(matches[2])
-				ss = int(matches[3])
-			else:
-				print("Can't find timestamp in track %d: %s" % (i, line))
-				cue += "  TRACK %02d AUDIO\n    PERFORMER FIXME\n    TITLE FIXME\n    INDEX 01 00:00:00\n" % i
-				errors += 1
-				continue
 
-		matches = re.findall(r"^\[[^\]]+\]([^-]+) - (.+)$", line)
-		if len(matches) == 1:
-			matches = matches[0]
-			artist_line = "\n    PERFORMER %s" % matches[0]
-			title = matches[1]
-		else:
-			# try version without "-"
-			matches = re.findall(r"^\[[^\]]+\](.+)$", line)
-			if len(matches) == 1:
-				artist_line = ""
-				title = matches[0] # so it turns out that when group cnt==1 then it's different :()
-			else:
-				print("Can't find track %d info: %s" % (i, line))
-				cue += "  TRACK %02d AUDIO\n    PERFORMER FIXME\n    TITLE FIXME\n    INDEX 01 %02d:%02d:%02d\n" % (i, hh, mm, ss)
-				errors += 1
-				continue
+		time_found = False
+		for extractor in time_extractors:
+			result = extractor(line)
+			if result is not None:
+				mm = result[0]
+				ss = result[1]
+				ms = result[2]
+				time_found = True
+				break
 
-		cue += "  TRACK %02d AUDIO%s\n    TITLE %s\n    INDEX 01 %02d:%02d:%02d\n" % (i, artist_line, title, hh, mm, ss)
+		if not time_found:
+			print("Can't find timestamp in track %d: %s" % (i, line))
+			cue += "  TRACK %02d AUDIO\n    PERFORMER FIXME\n    TITLE FIXME\n    INDEX 01 00:00:00\n" % i
+			errors += 1
+			continue
+
+		title_found = False
+		for extractor in title_extractors:
+			result = extractor(line)
+			if result is not None:
+				artist_line = result[0]
+				title = result[1]
+				title_found = True
+				break
+
+		if not title_found:
+			print("Can't find track %d info: %s" % (i, line))
+			cue += "  TRACK %02d AUDIO\n    PERFORMER FIXME\n    TITLE FIXME\n    INDEX 01 %02d:%02d:%02d\n" % (i, mm, ss, ms)
+			errors += 1
+			continue
+
+		cue += "  TRACK %02d AUDIO%s\n    TITLE %s\n    INDEX 01 %02d:%02d:%02d\n" % (i, artist_line, title, mm, ss, ms)
 	if errors > 0:
 		update_status("Completed with %d errors (see console), pls fix cuesheet manually" % errors)
 	else:
