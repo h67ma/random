@@ -1,5 +1,25 @@
 import re
 
+def extract_mm_ss(line):
+	matches = re.findall(r"^\[(\d+):(\d+)\]", line)
+	if len(matches) != 1:
+		return None
+	matches = matches[0]
+	mm = int(matches[0])
+	ss = int(matches[1])
+	return (mm, ss, 0)
+
+
+def extract_hh_mm_ss(line):
+	matches = re.findall(r"^\[(\d+):(\d+):(\d+)\]", line)
+	if len(matches) != 1:
+		return None
+	matches = matches[0]
+	mm = int(matches[0]) * 60 + int(matches[1])
+	ss = int(matches[2])
+	return (mm, ss, 0)
+
+
 def extract_mm_ss_ms(line):
 	matches = re.findall(r"^\[(\d+):(\d+)\.(\d+)\]", line)
 	if len(matches) != 1:

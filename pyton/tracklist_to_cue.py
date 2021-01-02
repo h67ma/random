@@ -3,7 +3,7 @@ import re
 from tkinter import StringVar, N, E, W, S, WORD, LEFT, RIGHT, Text, filedialog, END, INSERT
 from tkinter.ttk import Frame, LabelFrame, Label, Entry, Scrollbar, Button
 from tkinterdnd2 import TkinterDnD, DND_FILES
-from cue_extractors import extract_hh_mm_ss_ms, extract_mm_ss_ms, extract_title, extract_title_artist
+from cue_extractors import extract_hh_mm_ss_ms, extract_mm_ss_ms, extract_mm_ss, extract_hh_mm_ss, extract_title, extract_title_artist
 
 
 root = TkinterDnD.Tk()
@@ -44,7 +44,7 @@ def drop_file(event):
 
 
 def translate_to_cue():
-	time_extractors = [extract_hh_mm_ss_ms, extract_mm_ss_ms]
+	time_extractors = [extract_mm_ss, extract_hh_mm_ss, extract_hh_mm_ss_ms, extract_mm_ss_ms]
 	title_extractors = [extract_title_artist, extract_title]
 	tracklist = in_tracklist_box.get("1.0", END).split('\n')
 	track_name = in_track_name_txt.get()
