@@ -1,5 +1,5 @@
 import sys
-import re
+import os
 from tkinter import StringVar, N, E, W, S, WORD, LEFT, RIGHT, Text, filedialog, END, INSERT
 from tkinter.ttk import Frame, LabelFrame, Label, Entry, Scrollbar, Button
 from tkinterdnd2 import TkinterDnD, DND_FILES
@@ -11,7 +11,6 @@ root.title("tracklist to cue")
 
 # data
 in_track_name_txt = StringVar()
-out_cue_path_txt = StringVar()
 
 
 def update_status(new_status):
@@ -24,12 +23,12 @@ def update_out_cue(new_text):
 
 
 def select_output_file():
-	filename = filedialog.asksaveasfilename(title = "Create a file",
-											filetypes = [("all files", "*.*")])
+	filename = filedialog.askopenfilename(title = "Select a file",
+										filetypes = [("all files", "*.*")])
 	if filename == "":
 		update_status("Invalid file")
 		return
-	out_cue_path_txt.set(value=filename)
+	in_track_name_txt.set(value=filename)
 	update_status("Rdy")
 
 
@@ -40,14 +39,14 @@ def strip_mustache(string):
 
 
 def drop_file(event):
-	out_cue_path_txt.set(strip_mustache(event.data))
+	in_track_name_txt.set(strip_mustache(event.data))
 
 
 def translate_to_cue():
 	time_extractors = [extract_mm_ss, extract_hh_mm_ss, extract_hh_mm_ss_ms, extract_mm_ss_ms]
 	title_extractors = [extract_title_artist, extract_title]
 	tracklist = in_tracklist_box.get("1.0", END).split('\n')
-	track_name = in_track_name_txt.get()
+	track_name = os.path.basename(in_track_name_txt.get())
 
 	if tracklist == ['', '']:
 		update_status("Empty tracklist")
@@ -107,8 +106,8 @@ def translate_to_cue():
 
 
 def save():
-	cue_filename = out_cue_path_txt.get()
-	if cue_filename == "":
+	cue_filename = "".join(in_track_name_txt.get().split('.')[:-1]) + ".cue" # strip file extension, replace with cue
+	if cue_filename == ".cue":
 		update_status("Invalid file")
 		return
 
@@ -121,77 +120,76 @@ def save():
 
 
 # top layout
-f = Frame()
+#f = Frame()
+root.columnconfigure(0, pad=10, weight=1)
+root.columnconfigure(1, pad=10, weight=1)
 
-f.columnconfigure(0, pad=10)
-f.columnconfigure(1, pad=10)
-
-# in
-
-in_frame = LabelFrame(f, text="Input")
+root.rowconfigure(0, pad=10)
+root.rowconfigure(1, pad=10, weight=1)
+root.rowconfigure(2, pad=10)
 
 # track name groupbox
-relative_track_in_frame = LabelFrame(in_frame, text="Relative track filename")
-in_track_name = Entry(relative_track_in_frame, width=80, textvariable=in_track_name_txt)
-in_track_name.pack(fill="both", padx=5, pady=5)
-relative_track_in_frame.pack(fill="both", padx=5)
+cue_filename_frame = LabelFrame(root, text="Track filename")
+cue_filename_frame.columnconfigure(0, pad=10, weight=1)
+cue_filename_frame.columnconfigure(1, pad=10)
+cue_filename_frame.rowconfigure(0, pad=10)
+
+out_cue_f = Entry(cue_filename_frame, textvariable=in_track_name_txt)
+out_cue_f.drop_target_register(DND_FILES)
+out_cue_f.dnd_bind("<<Drop>>", drop_file)
+out_cue_f.grid(row=0, column=0, sticky=N+E+W+S, padx=5)
+
+select_in_btn = Button(cue_filename_frame, text="Select")
+select_in_btn.grid(row=0, column=1, sticky=N+E+W+S, padx=(0, 5))
+
+cue_filename_frame.grid(row=0, column=0, columnspan=2, sticky=N+E+W+S, padx=5)
 
 # in tracklist groupbox
-tracklist_in_frame = LabelFrame(in_frame, text="Tracklist")
+tracklist_in_frame = LabelFrame(root, text="Tracklist")
+tracklist_in_frame.columnconfigure(0, weight=1)
+tracklist_in_frame.rowconfigure(0, weight=1)
 
 in_tracklist_box = Text(tracklist_in_frame, wrap=WORD, height=50, width=60)
 in_tracklist_box_scroll = Scrollbar(tracklist_in_frame, orient="vertical", command=in_tracklist_box.yview)
 in_tracklist_box.configure(yscrollcommand=in_tracklist_box_scroll.set)
-in_tracklist_box_scroll.pack(side=RIGHT, expand=True, fill="both", padx=(0, 5), pady=5)
-in_tracklist_box.pack(side=LEFT, expand=True, fill="both", padx=(5, 0), pady=5)
-tracklist_in_frame.pack(fill="both", padx=5)
+in_tracklist_box_scroll.grid(row=0, column=1, sticky=N+E+W+S, padx=(0, 5), pady=(0, 5))
+in_tracklist_box.grid(row=0, column=0, sticky=N+E+W+S, padx=(5, 0), pady=(0, 5))
+tracklist_in_frame.grid(row=1, column=0, sticky=N+E+W+S, padx=5)
 
 # supported formats groupbox
-supported_formats_frame = LabelFrame(in_frame, text="Supported formats")
-Label(supported_formats_frame, text="[mm:ss.ms]Artist - Title\n[mm:ss.ms]Title\n[hh:mm:ss.ms]Artist - Title\n[hh:mm:ss.ms]Title").pack(expand=True, fill="both", padx=5, pady=(0, 5))
-supported_formats_frame.pack(expand=True, fill="both", padx=5, pady=(0, 5))
-
-in_frame.grid(row=0, column=0, sticky=N+E+W+S, padx=(0, 10))
-
-# out
-
-out_frame = LabelFrame(f, text="Output")
-
-# output cue filename groupbox
-cue_filename_frame = LabelFrame(out_frame, text="cue output path")
-
-out_cue_f = Entry(cue_filename_frame, width=67, textvariable=out_cue_path_txt)
-out_cue_f.drop_target_register(DND_FILES)
-out_cue_f.dnd_bind("<<Drop>>", drop_file)
-out_cue_f.grid(row=0, column=0, padx=5, pady=5)
-
-select_in_btn = Button(cue_filename_frame, text="Select")
-select_in_btn.grid(row=0, column=1)
-
-cue_filename_frame.pack(expand=False, fill="both", padx=5)
+supported_formats_frame = LabelFrame(root, text="Supported line formats")
+Label(supported_formats_frame, text="[hh:mm:ss.ms]Artist - Title / [hh:mm:ss.ms]Title\n[hh:mm:ss]Artist - Title / [hh:mm:ss]Title\n[mm:ss.ms]Artist - Title / [mm:ss.ms]Title\n[mm:ss]Artist - Title / [mm:ss]Title").pack(expand=True, fill="both", padx=5, pady=(0, 5))
+supported_formats_frame.grid(row=2, column=0, sticky=N+E+W+S, padx=5, pady=(0, 5))
 
 # out cue groupbox
-cue_out_frame = LabelFrame(out_frame, text="cue tracklist")
+cue_out_frame = LabelFrame(root, text="cue tracklist")
+cue_out_frame.columnconfigure(0, weight=1)
+cue_out_frame.rowconfigure(0, weight=1)
 
 out_cue_box = Text(cue_out_frame, wrap=WORD, height=50, width=60)
 out_cue_box_scroll = Scrollbar(cue_out_frame, orient="vertical", command=out_cue_box.yview)
 out_cue_box.configure(yscrollcommand=out_cue_box_scroll.set)
-out_cue_box_scroll.pack(side=RIGHT, expand=True, fill="both", padx=(0, 5), pady=5)
-out_cue_box.pack(side=LEFT, expand=True, fill="both", padx=(5, 0), pady=5)
-cue_out_frame.pack(expand=False, fill="both", padx=5)
+out_cue_box_scroll.grid(row=0, column=1, sticky=N+E+W+S, padx=(0, 5), pady=(0, 5))
+out_cue_box.grid(row=0, column=0, sticky=N+E+W+S, padx=(5, 0), pady=(0, 5))
+cue_out_frame.grid(row=1, column=1, sticky=N+E+W+S, padx=(0, 5))
 
-translate_btn = Button(out_frame, text="Translate")
-translate_btn.pack(expand=True, fill="both", pady=(5, 0), padx=5)
+btn_box = Frame(root)
+btn_box.columnconfigure(0, pad=10, weight=1)
+btn_box.columnconfigure(1, pad=10, weight=1)
 
-save_btn = Button(out_frame, text="Save")
-save_btn.pack(expand=True, fill="both", pady=(5, 0), padx=5)
+btn_box.rowconfigure(0, pad=10)
+btn_box.rowconfigure(0, pad=10)
 
-status_lbl = Label(out_frame, text="Rdy")
-status_lbl.pack(expand=False, fill="both", pady=5, padx=5)
+translate_btn = Button(btn_box, text="Translate")
+translate_btn.grid(row=0, column=0, sticky=N+E+W+S)
 
-out_frame.grid(row=0, column=1, sticky=N+E+W+S)
+save_btn = Button(btn_box, text="Save")
+save_btn.grid(row=0, column=1, sticky=N+E+W+S)
 
-f.pack(padx=5, pady=5)
+status_lbl = Label(btn_box, text="Rdy", wraplength=480)
+status_lbl.grid(row=1, column=0, columnspan=2, sticky=N+E+W+S)
+
+btn_box.grid(row=2, column=1, sticky=N+E+W+S, padx=(0, 5), pady=5)
 
 # callbacks
 
@@ -199,6 +197,4 @@ select_in_btn.configure(command=select_output_file)
 translate_btn.configure(command=translate_to_cue)
 save_btn.configure(command=save)
 
-
-root.resizable(0, 0) # prevent changing window size
 root.mainloop()
