@@ -61,60 +61,55 @@ open_after_done = IntVar(value=1)
 command = ""
 
 # top layout
-f = Frame()
+root.columnconfigure(0, pad=10, weight=1)
+root.columnconfigure(1, pad=10, weight=1)
+root.columnconfigure(2, pad=10, weight=1)
 
-f.columnconfigure(0, pad=10)
-f.columnconfigure(1, pad=10)
-f.columnconfigure(2, pad=10)
-
-f.rowconfigure(0, pad=10)
-f.rowconfigure(1, pad=10)
-f.rowconfigure(2, pad=10)
-f.rowconfigure(3, pad=10)
-f.rowconfigure(4, pad=10)
-f.rowconfigure(5, pad=10)
+root.rowconfigure(0, pad=10)
+root.rowconfigure(1, pad=10)
+root.rowconfigure(2, pad=10)
+root.rowconfigure(3, pad=10, weight=1)
+root.rowconfigure(4, pad=10)
+root.rowconfigure(5, pad=10)
 
 # IO groupbox
-in_out_frame = LabelFrame(f, text="IO")
-in_out_frame.grid(row=0, columnspan=3, sticky=N+E+W+S)
+in_out_frame = LabelFrame(root, text="IO")
 
-inside_in_out = Frame(in_out_frame)
+in_out_frame.columnconfigure(0, pad=10)
+in_out_frame.columnconfigure(1, pad=10, weight=1)
+in_out_frame.columnconfigure(2, pad=10)
 
-inside_in_out.columnconfigure(0, pad=10)
-inside_in_out.columnconfigure(1, pad=10)
-inside_in_out.columnconfigure(2, pad=10)
+in_out_frame.rowconfigure(0, pad=10)
+in_out_frame.rowconfigure(1, pad=10)
+in_out_frame.rowconfigure(2, pad=10)
 
-inside_in_out.rowconfigure(0, pad=10)
-inside_in_out.rowconfigure(1, pad=10)
-inside_in_out.rowconfigure(2, pad=10)
+Label(in_out_frame, text="In:").grid(row=0, column=0, sticky=W)
 
-Label(inside_in_out, text="In:").grid(row=0, column=0, sticky=W)
-
-in_lbl_f = Entry(inside_in_out, width=60, textvariable=in_txt)
+in_lbl_f = Entry(in_out_frame, width=60, textvariable=in_txt)
 in_lbl_f.drop_target_register(DND_FILES)
 in_lbl_f.dnd_bind("<<Drop>>", drop_in)
 in_lbl_f.grid(row=0, column=1, sticky=N+E+W+S)
 
-select_in_btn = Button(inside_in_out, text="Select")
-select_in_btn.grid(row=0, column=2, sticky=N+E+W+S)
+select_in_btn = Button(in_out_frame, text="Select")
+select_in_btn.grid(row=0, column=2, sticky=N+E+W+S, padx=3)
 
-Label(inside_in_out, text="Out:").grid(row=1, column=0, sticky=W)
+Label(in_out_frame, text="Out:").grid(row=1, column=0, sticky=W)
 
-out_lbl_f = Entry(inside_in_out, width=60, textvariable=out_txt)
+out_lbl_f = Entry(in_out_frame, width=60, textvariable=out_txt)
 out_lbl_f.drop_target_register(DND_FILES)
 out_lbl_f.dnd_bind("<<Drop>>", drop_out)
 out_lbl_f.grid(row=1, column=1, sticky=N+E+W+S)
 
-select_out_btn = Button(inside_in_out, text="Select")
-select_out_btn.grid(row=1, column=2, sticky=N+E+W+S)
+select_out_btn = Button(in_out_frame, text="Select")
+select_out_btn.grid(row=1, column=2, sticky=N+E+W+S, padx=3)
 
-Label(inside_in_out, text="Note: urls (blobs) also work").grid(row=2, column=0, columnspan=3, sticky=N+E+W+S)
+Label(in_out_frame, text="Note: urls (blobs) also work").grid(row=2, column=0, columnspan=3, sticky=N+E+W+S)
 
-inside_in_out.pack(expand=True, fill="both")
+in_out_frame.grid(row=0, columnspan=3, sticky=N+E+W+S, padx=5)
 
 # trim image groupbox
-trim_video_frame = LabelFrame(f, text="Trim image")
-trim_video_frame.grid(row=1, column=0, sticky=N+E+W+S, padx=(0, 10))
+trim_video_frame = LabelFrame(root, text="Trim image")
+trim_video_frame.grid(row=1, column=0, sticky=N+E+W+S, padx=5)
 
 inside_trim_video = Frame(trim_video_frame)
 
@@ -145,8 +140,8 @@ Entry(inside_trim_video, textvariable=h_txt, width=6, justify=CENTER).grid(row=2
 inside_trim_video.pack()
 
 # trim time groupbox
-trim_time_frame = LabelFrame(f, text="Trim time")
-trim_time_frame.grid(row=1, column=1, columnspan=2, sticky=N+E+W+S)
+trim_time_frame = LabelFrame(root, text="Trim time")
+trim_time_frame.grid(row=1, column=1, columnspan=2, sticky=N+E+W+S, padx=(0, 5))
 
 inside_trim_time = Frame(trim_time_frame)
 
@@ -193,8 +188,8 @@ Entry(inside_trim_time, textvariable=end_ms, width=6, justify=CENTER).grid(row=3
 inside_trim_time.pack()
 
 # video output
-output_video_frame = LabelFrame(f, text="Video output")
-output_video_frame.grid(row=2, column=0, sticky=N+E+W+S, padx=(0, 10))
+output_video_frame = LabelFrame(root, text="Video output")
+output_video_frame.grid(row=2, column=0, sticky=N+E+W+S, padx=5)
 
 inside_video_output = Frame(output_video_frame)
 
@@ -205,8 +200,8 @@ Radiobutton(inside_video_output, text="Copy", variable=video_output, value=2).pa
 inside_video_output.pack()
 
 # audio output
-output_audio_frame = LabelFrame(f, text="Audio output")
-output_audio_frame.grid(row=2, column=1, sticky=N+E+W+S, padx=(0, 10))
+output_audio_frame = LabelFrame(root, text="Audio output")
+output_audio_frame.grid(row=2, column=1, sticky=N+E+W+S, padx=(0, 5))
 
 inside_audio_output = Frame(output_audio_frame)
 
@@ -217,8 +212,8 @@ Radiobutton(inside_audio_output, text="Copy", variable=audio_output, value=2).pa
 inside_audio_output.pack()
 
 # extra options groupbox
-output_options_frame = LabelFrame(f, text="Extra options")
-output_options_frame.grid(row=2, column=2, sticky=N+E+W+S)
+output_options_frame = LabelFrame(root, text="Extra options")
+output_options_frame.grid(row=2, column=2, sticky=N+E+W+S, padx=(0, 5))
 
 inside_output_options = Frame(output_options_frame)
 
@@ -231,32 +226,30 @@ strict2_checkbox.pack(expand=True, fill="both")
 inside_output_options.pack()
 
 # commandline groupbox
-status_frame = LabelFrame(f, text="Command line")
-status_frame.grid(row=3, column=0, columnspan=3, sticky=N+E+W+S)
+status_frame = LabelFrame(root, text="Command line")
+status_frame.columnconfigure(0, weight=1)
+status_frame.columnconfigure(1)
 
-inside_status = Frame(status_frame)
+status_frame.rowconfigure(0, weight=1)
 
-command_box = Text(inside_status, wrap=WORD, height=6, width=60)
-commandbox_scroll = Scrollbar(inside_status, orient="vertical", command=command_box.yview)
+command_box = Text(status_frame, wrap=WORD, height=6, width=60)
+commandbox_scroll = Scrollbar(status_frame, orient="vertical", command=command_box.yview)
 command_box.configure(yscrollcommand=commandbox_scroll.set)
-commandbox_scroll.pack(side=RIGHT, expand=True, fill="both")
-command_box.pack(side=LEFT, expand=True, fill="both")
+command_box.grid(row=0, column=0, sticky=N+E+W+S, padx=(5, 0), pady=(0, 5))
+commandbox_scroll.grid(row=0, column=1, sticky=N+E+W+S, padx=(0, 5), pady=(0, 5))
 
-inside_status.pack(expand=True, fill="both")
+status_frame.grid(row=3, column=0, columnspan=3, sticky=N+E+W+S, padx=5)
 
 # run btn and open output checkbox
-run_btn = Button(f, text="Run")
-run_btn.grid(row=4, column=0, columnspan=2, sticky=N+E+W+S)
+run_btn = Button(root, text="Run")
+run_btn.grid(row=4, column=0, columnspan=2, sticky=N+E+W+S, padx=5)
 
-open_after_checkbox = Checkbutton(f, text="Open output after done", variable=open_after_done)
-open_after_checkbox.grid(row=4, column=2)
+open_after_checkbox = Checkbutton(root, text="Open output after done", variable=open_after_done)
+open_after_checkbox.grid(row=4, column=2, padx=(0, 5))
 
 # status lbl
-status_lbl = Label(f, text="Rdy")
-status_lbl.grid(row=5, column=0, columnspan=3, sticky=N+E+W+S)
-
-
-f.pack(padx=10, pady=5)
+status_lbl = Label(root, text="Rdy")
+status_lbl.grid(row=5, column=0, columnspan=3, sticky=N+E+W+S, padx=5)
 
 
 def update_status(new_status):
@@ -389,5 +382,4 @@ strict2_checkbox.configure(command=update_command)
 run_btn.configure(command=run)
 
 Tk.report_callback_exception = lambda *args: update_status("invalid input") # cringe
-root.resizable(0, 0) # prevent changing window size
 root.mainloop()
