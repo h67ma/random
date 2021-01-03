@@ -1,0 +1,82 @@
+[12:34:56.78]
+[2:4:6.8]
+[12:34:56]
+[2:4:6]
+[34:56]
+[4:6]
+[34:56.78]
+[4:6.7]
+
+
+[12:34:56.78] Title
+[2:4:6.8] Title
+[12:34:56] Title
+[2:4:6] Title
+[34:56] Title
+[4:6] Title
+[34:56.78] Title
+[4:6.7] Title
+
+[12:34:56.78]Title
+[2:4:6.8]Title
+[12:34:56]Title
+[2:4:6]Title
+[34:56]Title
+[4:6]Title
+[34:56.78]Title
+[4:6.7]Title
+
+[12:34:56.78] Artist - Title
+[2:4:6.8] Artist - Title
+[12:34:56] Artist - Title
+[2:4:6] Artist - Title
+[34:56] Artist - Title
+[4:6] Artist - Title
+[34:56.78] Artist - Title
+[4:6.7] Artist - Title
+
+[12:34:56.78]Artist - Title
+[2:4:6.8]Artist - Title
+[12:34:56]Artist - Title
+[2:4:6]Artist - Title
+[34:56]Artist - Title
+[4:6]Artist - Title
+[34:56.78]Artist - Title
+[4:6.7]Artist - Title
+
+
+12:34:56.78 Title
+2:4:6.8 Title
+12:34:56 Title
+2:4:6 Title
+34:56 Title
+4:6 Title
+34:56.78 Title
+4:6.7 Title
+
+12:34:56.78Title
+2:4:6.8Title
+12:34:56Title
+2:4:6Title
+34:56Title
+4:6Title
+34:56.78Title
+4:6.7Title
+
+12:34:56.78 Artist - Title
+2:4:6.8 Artist - Title
+12:34:56 Artist - Title
+2:4:6 Artist - Title
+34:56 Artist - Title
+4:6 Artist - Title
+34:56.78 Artist - Title
+4:6.7 Artist - Title
+
+12:34:56.78Artist - Title
+2:4:6.8Artist - Title
+12:34:56Artist - Title
+2:4:6Artist - Title
+34:56Artist - Title
+4:6Artist - Title
+34:56.78Artist - Title
+4:6.7Artist - Title

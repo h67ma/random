@@ -3,7 +3,7 @@ import os
 from tkinter import StringVar, N, E, W, S, WORD, LEFT, RIGHT, Text, filedialog, END, INSERT
 from tkinter.ttk import Frame, LabelFrame, Label, Entry, Scrollbar, Button
 from tkinterdnd2 import TkinterDnD, DND_FILES
-from cue_extractors import extract_hh_mm_ss_ms, extract_mm_ss_ms, extract_mm_ss, extract_hh_mm_ss, extract_title, extract_title_artist
+from cue_extractors import line_extractors
 
 
 root = TkinterDnD.Tk()
@@ -43,8 +43,6 @@ def drop_file(event):
 
 
 def translate_to_cue():
-	time_extractors = [extract_mm_ss, extract_hh_mm_ss, extract_hh_mm_ss_ms, extract_mm_ss_ms]
-	title_extractors = [extract_title_artist, extract_title]
 	tracklist = in_tracklist_box.get("1.0", END).split('\n')
 	track_name = os.path.basename(in_track_name_txt.get())
 
@@ -66,34 +64,22 @@ def translate_to_cue():
 			continue
 		i += 1
 
-		time_found = False
-		for extractor in time_extractors:
+		found = False
+		for extractor in line_extractors:
 			result = extractor(line)
 			if result is not None:
 				mm = result[0]
 				ss = result[1]
 				ms = result[2]
-				time_found = True
+				artist = result[3]
+				artist_line = "\n    PERFORMER " + artist if artist != "" else ""
+				title = result[4]
+				found = True
 				break
 
-		if not time_found:
+		if not found:
 			print("Can't find timestamp in track %d: %s" % (i, line))
 			cue += "  TRACK %02d AUDIO\n    PERFORMER FIXME\n    TITLE FIXME\n    INDEX 01 00:00:00\n" % i
-			errors += 1
-			continue
-
-		title_found = False
-		for extractor in title_extractors:
-			result = extractor(line)
-			if result is not None:
-				artist_line = result[0]
-				title = result[1]
-				title_found = True
-				break
-
-		if not title_found:
-			print("Can't find track %d info: %s" % (i, line))
-			cue += "  TRACK %02d AUDIO\n    PERFORMER FIXME\n    TITLE FIXME\n    INDEX 01 %02d:%02d:%02d\n" % (i, mm, ss, ms)
 			errors += 1
 			continue
 
@@ -156,10 +142,28 @@ in_tracklist_box_scroll.grid(row=0, column=1, sticky=N+E+W+S, padx=(0, 5), pady=
 in_tracklist_box.grid(row=0, column=0, sticky=N+E+W+S, padx=(5, 0), pady=(0, 5))
 tracklist_in_frame.grid(row=1, column=0, sticky=N+E+W+S, padx=5)
 
-# supported formats groupbox
-supported_formats_frame = LabelFrame(root, text="Supported line formats")
-Label(supported_formats_frame, text="[hh:mm:ss.ms]Artist - Title / [hh:mm:ss.ms]Title\n[hh:mm:ss]Artist - Title / [hh:mm:ss]Title\n[mm:ss.ms]Artist - Title / [mm:ss.ms]Title\n[mm:ss]Artist - Title / [mm:ss]Title").pack(expand=True, fill="both", padx=5, pady=(0, 5))
-supported_formats_frame.grid(row=2, column=0, sticky=N+E+W+S, padx=5, pady=(0, 5))
+# supported formats groupboxex
+help_frame = Frame(root)
+
+help_frame.columnconfigure(0, weight=1)
+help_frame.columnconfigure(1, weight=1)
+help_frame.columnconfigure(2, weight=1)
+
+help_frame.rowconfigure(0, weight=1)
+
+supported_formats_frame = LabelFrame(help_frame, text="Supported time formats")
+Label(supported_formats_frame, text="[hh:mm:ss.ms]\n[hh:mm:ss]\n[mm:ss.ms]\n[mm:ss]").pack(expand=True, fill="both", padx=5, pady=(0, 5))
+supported_formats_frame.grid(row=0, column=0, sticky=N+E+W+S, padx=5)
+
+supported_formats_frame = LabelFrame(help_frame, text="Supported artist/title formats")
+Label(supported_formats_frame, text="Title\nArtist - Title").pack(expand=True, fill="both", padx=5, pady=(0, 5))
+supported_formats_frame.grid(row=0, column=1, sticky=N+E+W+S)
+
+supported_formats_frame = LabelFrame(help_frame, text="Examples")
+Label(supported_formats_frame, text="[12:34:56.78]Title\n[12:34:56] Artist - Title\n34:56 Title\n34:56.789 Title - Artist").pack(expand=True, fill="both", padx=5, pady=(0, 5))
+supported_formats_frame.grid(row=0, column=2, sticky=N+E+W+S, padx=5)
+
+help_frame.grid(row=2, column=0, sticky=N+E+W+S, pady=(0, 5))
 
 # out cue groupbox
 cue_out_frame = LabelFrame(root, text="cue tracklist")
