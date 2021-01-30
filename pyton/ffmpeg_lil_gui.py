@@ -5,6 +5,7 @@ import sys
 from tkinter import Tk, StringVar, IntVar, Text, filedialog, N, E, W, S, CENTER, LEFT, RIGHT, INSERT, WORD, END
 from tkinter.ttk import Frame, LabelFrame, Label, Button, Checkbutton, Entry, Radiobutton, Scrollbar
 from tkinterdnd2 import TkinterDnD, DND_FILES
+from functools import partial
 
 if len(sys.argv) < 2:
 	print("arg1 = path to default dir")
@@ -29,7 +30,8 @@ root = TkinterDnD.Tk()
 root.title("lil ffmpeg helper")
 
 # data
-in_txt = StringVar()
+in_txt1 = StringVar()
+in_txt2 = StringVar()
 out_txt = StringVar()
 
 def strip_mustache(string):
@@ -37,8 +39,11 @@ def strip_mustache(string):
 		return string[1:-1]
 	return string
 
-def drop_in(event):
-	in_txt.set(strip_mustache(event.data))
+def drop_in1(event):
+	in_txt1.set(strip_mustache(event.data))
+
+def drop_in2(event):
+	in_txt2.set(strip_mustache(event.data))
 
 def drop_out(event):
 	out_txt.set(strip_mustache(event.data))
@@ -89,28 +94,39 @@ in_out_frame.columnconfigure(2, pad=10)
 in_out_frame.rowconfigure(0, pad=10)
 in_out_frame.rowconfigure(1, pad=10)
 in_out_frame.rowconfigure(2, pad=10)
+in_out_frame.rowconfigure(3, pad=10)
 
-Label(in_out_frame, text="In:").grid(row=0, column=0, sticky=W)
+Label(in_out_frame, text="In 1:").grid(row=0, column=0, sticky=W)
 
-in_lbl_f = Entry(in_out_frame, width=60, textvariable=in_txt)
-in_lbl_f.drop_target_register(DND_FILES)
-in_lbl_f.dnd_bind("<<Drop>>", drop_in)
-in_lbl_f.grid(row=0, column=1, sticky=N+E+W+S)
+in_lbl_f1 = Entry(in_out_frame, width=60, textvariable=in_txt1)
+in_lbl_f1.drop_target_register(DND_FILES)
+in_lbl_f1.dnd_bind("<<Drop>>", drop_in1)
+in_lbl_f1.grid(row=0, column=1, sticky=N+E+W+S)
 
-select_in_btn = Button(in_out_frame, text="Select")
-select_in_btn.grid(row=0, column=2, sticky=N+E+W+S, padx=3)
+select_in_btn1 = Button(in_out_frame, text="Select")
+select_in_btn1.grid(row=0, column=2, sticky=N+E+W+S, padx=3)
 
-Label(in_out_frame, text="Out:").grid(row=1, column=0, sticky=W)
+Label(in_out_frame, text="In 2:").grid(row=1, column=0, sticky=W)
+
+in_lbl_f2 = Entry(in_out_frame, width=60, textvariable=in_txt2)
+in_lbl_f2.drop_target_register(DND_FILES)
+in_lbl_f2.dnd_bind("<<Drop>>", drop_in2)
+in_lbl_f2.grid(row=1, column=1, sticky=N+E+W+S)
+
+select_in_btn2 = Button(in_out_frame, text="Select")
+select_in_btn2.grid(row=1, column=2, sticky=N+E+W+S, padx=3)
+
+Label(in_out_frame, text="Out:").grid(row=2, column=0, sticky=W)
 
 out_lbl_f = Entry(in_out_frame, width=60, textvariable=out_txt)
 out_lbl_f.drop_target_register(DND_FILES)
 out_lbl_f.dnd_bind("<<Drop>>", drop_out)
-out_lbl_f.grid(row=1, column=1, sticky=N+E+W+S)
+out_lbl_f.grid(row=2, column=1, sticky=N+E+W+S)
 
 select_out_btn = Button(in_out_frame, text="Select")
-select_out_btn.grid(row=1, column=2, sticky=N+E+W+S, padx=3)
+select_out_btn.grid(row=2, column=2, sticky=N+E+W+S, padx=3)
 
-Label(in_out_frame, text="Default output dir: " + default_dir).grid(row=2, column=0, columnspan=3, sticky=N+E+W+S)
+Label(in_out_frame, text="Default output dir: " + default_dir).grid(row=3, column=0, columnspan=3, sticky=N+E+W+S)
 
 in_out_frame.grid(row=0, columnspan=3, sticky=N+E+W+S, padx=5)
 
@@ -268,12 +284,12 @@ def set_command_text(new_text):
 	command_box.insert(INSERT, new_text)
 
 
-def select_input_file():
+def select_input_file(in_txt_control):
 	filename = filedialog.askopenfilename(title = "Select a file", filetypes = [("all files", "*.*")])
 	if filename == "":
 		update_status("Invalid file")
 		return
-	in_txt.set(value=filename)
+	in_txt_control.set(value=filename)
 
 	vid_data = os.popen("ffprobe -v error -select_streams v:0 -show_entries stream=width,height,duration -of csv=s=,:p=0 \"%s\"" % filename)
 	vid_data = vid_data.read().split(',')
@@ -309,12 +325,24 @@ def run_ffmpeg_thread(command):
 	else:
 		update_status("ffmpeg finished with errors, check console")
 	if open_after_done.get() == 1:
-		subprocess.call("\"%s\"" % out_txt.get(), shell=True)
+		subprocess.call("\"%s\"" % get_output_filename(), shell=True)
 
 
 def update_command():
-	# input filename, overwrite without asking
-	command = "ffmpeg -i \"%s\" -y" % in_txt.get()
+	command = "ffmpeg" # it's a start
+
+	# input file(s)
+	in_filename1 = in_txt1.get()
+	in_filename2 = in_txt2.get()
+
+	if in_filename1 != "":
+		command += " -i \"%s\"" % in_filename1
+
+	if in_filename2 != "":
+		command += " -i \"%s\"" % in_filename2
+
+	# overwrite without asking
+	command += " -y"
 
 	# trim image
 	if trim_video.get() == 1:
@@ -349,15 +377,19 @@ def update_command():
 		command += " -strict -2"
 
 	# finally, output filename
+	command += " \"%s\"" % get_output_filename()
+
+	set_command_text(command)
+
+
+def get_output_filename():
 	target_file = out_txt.get()
 
 	if "/" not in target_file and "\\" not in target_file:
 		# only filename - append default dir
 		target_file = os.path.join(default_dir, target_file)
 
-	command += " \"%s\"" % target_file
-
-	set_command_text(command)
+	return target_file
 
 
 def run():
@@ -367,11 +399,16 @@ def run():
 
 
 # callbacks
-select_in_btn.configure(command=select_input_file)
+
+select_in_btn1.configure(command=partial(select_input_file, in_txt1))
+select_in_btn2.configure(command=partial(select_input_file, in_txt2))
 select_out_btn.configure(command=select_output_file)
 
+# update output command on any control change:
+
 enable_video_trim.configure(command=update_command)
-in_txt.trace("w", lambda *a: update_command())
+in_txt1.trace("w", lambda *a: update_command())
+in_txt2.trace("w", lambda *a: update_command())
 out_txt.trace("w", lambda *a: update_command())
 
 x_txt.trace("w", lambda *a: update_command())
