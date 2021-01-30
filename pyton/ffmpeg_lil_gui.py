@@ -1,9 +1,16 @@
 import os
 import threading
 import subprocess
+import sys
 from tkinter import Tk, StringVar, IntVar, Text, filedialog, N, E, W, S, CENTER, LEFT, RIGHT, INSERT, WORD, END
 from tkinter.ttk import Frame, LabelFrame, Label, Button, Checkbutton, Entry, Radiobutton, Scrollbar
 from tkinterdnd2 import TkinterDnD, DND_FILES
+
+if len(sys.argv) < 2:
+	print("arg1 = path to default dir")
+	exit()
+
+default_dir = sys.argv[1]
 
 def float_get_after_decimal(val):
 	return int(str(val - int(val))[2:]) # this is so bad, but it works
@@ -103,7 +110,7 @@ out_lbl_f.grid(row=1, column=1, sticky=N+E+W+S)
 select_out_btn = Button(in_out_frame, text="Select")
 select_out_btn.grid(row=1, column=2, sticky=N+E+W+S, padx=3)
 
-Label(in_out_frame, text="Note: urls (blobs) also work").grid(row=2, column=0, columnspan=3, sticky=N+E+W+S)
+Label(in_out_frame, text="Default output dir: " + default_dir).grid(row=2, column=0, columnspan=3, sticky=N+E+W+S)
 
 in_out_frame.grid(row=0, columnspan=3, sticky=N+E+W+S, padx=5)
 
@@ -337,11 +344,19 @@ def update_command():
 	if gif.get() == 1:
 		command += " -gifflags +transdiff"
 
+	# some random flag that fixes random problems
 	if strict2.get() == 1:
 		command += " -strict -2"
 
 	# finally, output filename
-	command += " \"%s\"" % out_txt.get()
+	target_file = out_txt.get()
+
+	if "/" not in target_file and "\\" not in target_file:
+		# only filename - append default dir
+		target_file = os.path.join(default_dir, target_file)
+
+	command += " \"%s\"" % target_file
+
 	set_command_text(command)
 
 
