@@ -26,6 +26,25 @@ def sms_to_hmsms(s):
 	out_s = int(s % 60)
 	return out_h, out_m, out_s
 
+
+def strip_mustache(string):
+	if string[0] == "{" and string[-1] == "}":
+		return string[1:-1]
+	return string
+
+
+def drop_in1(event):
+	in_txt1.set(strip_mustache(event.data))
+
+
+def drop_in2(event):
+	in_txt2.set(strip_mustache(event.data))
+
+
+def drop_out(event):
+	out_txt.set(strip_mustache(event.data))
+
+
 root = TkinterDnD.Tk()
 root.title("lil ffmpeg helper")
 
@@ -33,20 +52,6 @@ root.title("lil ffmpeg helper")
 in_txt1 = StringVar()
 in_txt2 = StringVar()
 out_txt = StringVar()
-
-def strip_mustache(string):
-	if string[0] == "{" and string[-1] == "}":
-		return string[1:-1]
-	return string
-
-def drop_in1(event):
-	in_txt1.set(strip_mustache(event.data))
-
-def drop_in2(event):
-	in_txt2.set(strip_mustache(event.data))
-
-def drop_out(event):
-	out_txt.set(strip_mustache(event.data))
 
 trim_video = IntVar(value=0)
 x_txt = IntVar(value=0)
@@ -277,6 +282,7 @@ status_lbl.grid(row=5, column=0, columnspan=3, sticky=N+E+W+S, padx=5)
 
 def update_status(new_status):
 	status_lbl.configure(text=new_status)
+	print(new_status)
 
 
 def set_command_text(new_text):
@@ -291,6 +297,7 @@ def select_input_file(in_txt_control):
 		return
 	in_txt_control.set(value=filename)
 
+	update_status("Autodetecting input properties...")
 	vid_data = os.popen("ffprobe -v error -select_streams v:0 -show_entries stream=width,height,duration -of csv=s=,:p=0 \"%s\"" % filename)
 	vid_data = vid_data.read().split(',')
 	w_txt.set(vid_data[0])
@@ -404,34 +411,42 @@ select_in_btn1.configure(command=partial(select_input_file, in_txt1))
 select_in_btn2.configure(command=partial(select_input_file, in_txt2))
 select_out_btn.configure(command=select_output_file)
 
-# update output command on any control change:
+update_command_on_change_controls = [
+	enable_video_trim,
+	enable_time_trim,
+	gif_checkbox,
+	strict2_checkbox
+]
 
-enable_video_trim.configure(command=update_command)
-in_txt1.trace("w", lambda *a: update_command())
-in_txt2.trace("w", lambda *a: update_command())
-out_txt.trace("w", lambda *a: update_command())
+for control in update_command_on_change_controls:
+	control.configure(command=update_command)
 
-x_txt.trace("w", lambda *a: update_command())
-y_txt.trace("w", lambda *a: update_command())
-w_txt.trace("w", lambda *a: update_command())
-h_txt.trace("w", lambda *a: update_command())
+update_command_on_text_change_controls = [
+	in_txt1,
+	in_txt2,
+	out_txt,
+	x_txt,
+	y_txt,
+	w_txt,
+	h_txt,
+	start_h,
+	start_m,
+	start_s,
+	start_ms,
+	end_h,
+	end_m,
+	end_s,
+	end_ms,
+	video_output,
+	audio_output
+]
 
-enable_time_trim.configure(command=update_command)
-start_h.trace("w", lambda *a: update_command())
-start_m.trace("w", lambda *a: update_command())
-start_s.trace("w", lambda *a: update_command())
-start_ms.trace("w", lambda *a: update_command())
-end_h.trace("w", lambda *a: update_command())
-end_m.trace("w", lambda *a: update_command())
-end_s.trace("w", lambda *a: update_command())
-end_ms.trace("w", lambda *a: update_command())
-
-video_output.trace("w", lambda *a: update_command())
-audio_output.trace("w", lambda *a: update_command())
-gif_checkbox.configure(command=update_command)
-strict2_checkbox.configure(command=update_command)
+for control in update_command_on_text_change_controls:
+	control.trace("w", lambda *a: update_command())
 
 run_btn.configure(command=run)
 
 Tk.report_callback_exception = lambda *args: update_status("invalid input") # cringe
+
+# run
 root.mainloop()
