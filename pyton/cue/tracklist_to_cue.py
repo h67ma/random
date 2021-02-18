@@ -43,7 +43,7 @@ def drop_file(event):
 
 
 def translate_to_cue():
-	tracklist = in_tracklist_box.get("1.0", END).split('\n')
+	tracklist = in_tracklist_box.get("1.0", END).replace('\u200b', '').split('\n') # \u2000b appears when copying timestamp links from yt
 	track_name = os.path.basename(in_track_name_txt.get())
 
 	if tracklist == ['', '']:
