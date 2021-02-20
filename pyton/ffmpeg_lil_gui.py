@@ -2,7 +2,7 @@ import os
 import threading
 import subprocess
 import sys
-from tkinter import Tk, StringVar, IntVar, Text, filedialog, N, E, W, S, CENTER, LEFT, RIGHT, INSERT, WORD, END
+from tkinter import Tk, StringVar, IntVar, Text, filedialog, N, E, W, S, CENTER, INSERT, WORD, END, DISABLED, NORMAL
 from tkinter.ttk import Frame, LabelFrame, Label, Button, Checkbutton, Entry, Radiobutton, Scrollbar
 from tkinterdnd2 import TkinterDnD, DND_FILES
 from functools import partial
@@ -78,16 +78,16 @@ open_after_done = IntVar(value=1)
 command = ""
 
 # top layout
-root.columnconfigure(0, pad=10, weight=1)
-root.columnconfigure(1, pad=10, weight=1)
-root.columnconfigure(2, pad=10, weight=1)
+root.columnconfigure(0, pad=10)
+root.columnconfigure(1, pad=10)
+root.columnconfigure(2, pad=10)
+root.columnconfigure(3, pad=10, weight=1)
 
 root.rowconfigure(0, pad=10)
 root.rowconfigure(1, pad=10)
 root.rowconfigure(2, pad=10)
 root.rowconfigure(3, pad=10, weight=1)
 root.rowconfigure(4, pad=10)
-root.rowconfigure(5, pad=10)
 
 # IO groupbox
 in_out_frame = LabelFrame(root, text="IO")
@@ -133,7 +133,7 @@ select_out_btn.grid(row=2, column=2, sticky=N+E+W+S, padx=3)
 
 Label(in_out_frame, text="Default output dir: " + default_dir).grid(row=3, column=0, columnspan=3, sticky=N+E+W+S)
 
-in_out_frame.grid(row=0, columnspan=3, sticky=N+E+W+S, padx=5)
+in_out_frame.grid(row=0, column=0, columnspan=4, sticky=N+E+W+S, padx=5)
 
 # trim image groupbox
 trim_video_frame = LabelFrame(root, text="Trim image")
@@ -260,7 +260,7 @@ status_frame.columnconfigure(1)
 
 status_frame.rowconfigure(0, weight=1)
 
-command_box = Text(status_frame, wrap=WORD, height=6, width=60)
+command_box = Text(status_frame, wrap=WORD, height=10, width=60)
 commandbox_scroll = Scrollbar(status_frame, orient="vertical", command=command_box.yview)
 command_box.configure(yscrollcommand=commandbox_scroll.set)
 command_box.grid(row=0, column=0, sticky=N+E+W+S, padx=(5, 0), pady=(0, 5))
@@ -270,24 +270,40 @@ status_frame.grid(row=3, column=0, columnspan=3, sticky=N+E+W+S, padx=5)
 
 # run btn and open output checkbox
 run_btn = Button(root, text="Run")
-run_btn.grid(row=4, column=0, columnspan=2, sticky=N+E+W+S, padx=5)
+run_btn.grid(row=4, column=0, columnspan=2, sticky=N+E+W+S, padx=5, pady=(0, 5))
 
 open_after_checkbox = Checkbutton(root, text="Open output after done", variable=open_after_done)
-open_after_checkbox.grid(row=4, column=2, padx=(0, 5))
+open_after_checkbox.grid(row=4, column=2, padx=(0, 5), pady=(0, 5))
 
-# status lbl
-status_lbl = Label(root, text="Rdy")
-status_lbl.grid(row=5, column=0, columnspan=3, sticky=N+E+W+S, padx=5)
+# log groupbox
+log_frame = LabelFrame(root, text="Log")
+log_frame.columnconfigure(0, weight=1)
+log_frame.columnconfigure(1)
+
+log_frame.rowconfigure(0, weight=1)
+
+log_box = Text(log_frame, state=DISABLED, wrap=WORD, width=80)
+logbox_scroll = Scrollbar(log_frame, orient="vertical", command=log_box.yview)
+log_box.configure(yscrollcommand=logbox_scroll.set)
+log_box.grid(row=0, column=0, sticky=N+E+W+S, padx=(5, 0), pady=(0, 5))
+logbox_scroll.grid(row=0, column=1, sticky=N+E+W+S, padx=(0, 5), pady=(0, 5))
+
+log_frame.grid(row=1, column=3, rowspan=4, sticky=N+E+W+S, padx=5, pady=(0, 5))
 
 
 def update_status(new_status):
-	status_lbl.configure(text=new_status)
-	print(new_status)
+	append_log_text("> %s\n" % new_status)
 
 
 def set_command_text(new_text):
 	command_box.delete("1.0", END)
 	command_box.insert(INSERT, new_text)
+
+
+def append_log_text(new_line):
+	log_box.configure(state=NORMAL) # cringe
+	log_box.insert(INSERT, new_line)
+	log_box.configure(state=DISABLED) # cringe 2
 
 
 def select_input_file(in_txt_control):
@@ -326,13 +342,29 @@ def select_output_file():
 
 
 def run_ffmpeg_thread(command):
-	result = os.system(command)
-	if result == 0:
+	try:
+		p = subprocess.Popen(command, stderr=subprocess.PIPE, shell=True)
+	except FileNotFoundError as ex:
+		append_log_text(ex)
+		append_log_text('\n')
+		update_status("Error running ffmpeg, check commandline")
+		return
+
+	while True:
+		retcode = p.poll() # returns None while subprocess is running
+		line = p.stderr.readline() # ffmpeg only prints to stderr
+		append_log_text(line)
+		if retcode is not None:
+			break
+
+	if retcode == 0:
 		update_status("Success")
+		if open_after_done.get() == 1:
+			retcode = subprocess.call("\"%s\"" % get_output_filename(), shell=True)
+			if retcode != 0:
+				update_status("Can't open output")
 	else:
-		update_status("ffmpeg finished with errors, check console")
-	if open_after_done.get() == 1:
-		subprocess.call("\"%s\"" % get_output_filename(), shell=True)
+		update_status("ffmpeg finished with errors")
 
 
 def update_command():
@@ -447,6 +479,8 @@ for control in update_command_on_text_change_controls:
 run_btn.configure(command=run)
 
 Tk.report_callback_exception = lambda *args: update_status("invalid input") # cringe
+
+set_command_text("ffmpeg")
 
 # run
 root.mainloop()
