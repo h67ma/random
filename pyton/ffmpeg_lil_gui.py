@@ -2,9 +2,10 @@ import os
 import threading
 import subprocess
 import sys
-from tkinter import Tk, StringVar, IntVar, Text, filedialog, N, E, W, S, CENTER, INSERT, WORD, END, DISABLED, NORMAL
-from tkinter.ttk import Frame, LabelFrame, Label, Button, Checkbutton, Entry, Radiobutton, Scrollbar
+from tkinter import Tk, StringVar, IntVar, filedialog, N, E, W, S, CENTER, INSERT, WORD, END, DISABLED, NORMAL
+from tkinter.ttk import Frame, LabelFrame, Label, Button, Checkbutton, Entry, Radiobutton
 from tkinterdnd2 import TkinterDnD, DND_FILES
+from tkinter.scrolledtext import ScrolledText
 from functools import partial
 
 if len(sys.argv) < 2:
@@ -255,16 +256,9 @@ inside_output_options.pack()
 
 # commandline groupbox
 status_frame = LabelFrame(root, text="Command line")
-status_frame.columnconfigure(0, weight=1)
-status_frame.columnconfigure(1)
 
-status_frame.rowconfigure(0, weight=1)
-
-command_box = Text(status_frame, wrap=WORD, height=10, width=60)
-commandbox_scroll = Scrollbar(status_frame, orient="vertical", command=command_box.yview)
-command_box.configure(yscrollcommand=commandbox_scroll.set)
-command_box.grid(row=0, column=0, sticky=N+E+W+S, padx=(5, 0), pady=(0, 5))
-commandbox_scroll.grid(row=0, column=1, sticky=N+E+W+S, padx=(0, 5), pady=(0, 5))
+command_box = ScrolledText(status_frame, wrap=WORD, height=10, width=60)
+command_box.pack(expand=True, fill="both", padx=5, pady=5)
 
 status_frame.grid(row=3, column=0, columnspan=3, sticky=N+E+W+S, padx=5)
 
@@ -277,16 +271,9 @@ open_after_checkbox.grid(row=4, column=2, padx=(0, 5), pady=(0, 5))
 
 # log groupbox
 log_frame = LabelFrame(root, text="Log")
-log_frame.columnconfigure(0, weight=1)
-log_frame.columnconfigure(1)
 
-log_frame.rowconfigure(0, weight=1)
-
-log_box = Text(log_frame, state=DISABLED, wrap=WORD, width=80)
-logbox_scroll = Scrollbar(log_frame, orient="vertical", command=log_box.yview)
-log_box.configure(yscrollcommand=logbox_scroll.set)
-log_box.grid(row=0, column=0, sticky=N+E+W+S, padx=(5, 0), pady=(0, 5))
-logbox_scroll.grid(row=0, column=1, sticky=N+E+W+S, padx=(0, 5), pady=(0, 5))
+log_box = ScrolledText(log_frame, state=DISABLED, wrap=WORD, width=80)
+log_box.pack(expand=True, fill="both", padx=5, pady=5)
 
 log_frame.grid(row=1, column=3, rowspan=4, sticky=N+E+W+S, padx=5, pady=(0, 5))
 
@@ -304,6 +291,7 @@ def append_log_text(new_line):
 	log_box.configure(state=NORMAL) # cringe
 	log_box.insert(INSERT, new_line)
 	log_box.configure(state=DISABLED) # cringe 2
+	log_box.yview(END) # scroll to bottom
 
 
 def select_input_file(in_txt_control):
