@@ -289,7 +289,7 @@ def set_command_text(new_text):
 
 def append_log_text(new_line):
 	log_box.configure(state=NORMAL) # cringe
-	log_box.insert(INSERT, new_line)
+	log_box.insert(END, new_line)
 	log_box.configure(state=DISABLED) # cringe 2
 	log_box.yview(END) # scroll to bottom
 
