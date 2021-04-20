@@ -331,7 +331,7 @@ def select_output_file():
 
 def run_ffmpeg_thread(command):
 	try:
-		p = subprocess.Popen(command, stderr=subprocess.PIPE, shell=True)
+		p = subprocess.Popen(command, stderr=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
 	except FileNotFoundError as ex:
 		append_log_text(ex)
 		append_log_text('\n')
@@ -340,8 +340,12 @@ def run_ffmpeg_thread(command):
 
 	while True:
 		retcode = p.poll() # returns None while subprocess is running
-		line = p.stderr.readline() # ffmpeg only prints to stderr
-		append_log_text(line)
+
+		outs, errs = p.communicate()
+
+		append_log_text(outs)
+		append_log_text(errs)
+
 		if retcode is not None:
 			break
 
