@@ -74,6 +74,7 @@ video_output = IntVar(value=0)
 audio_output = IntVar(value=0)
 gif = IntVar(value=0)
 strict2 = IntVar(value=0)
+append_reversed = IntVar(value=0)
 open_after_done = IntVar(value=1)
 
 command = ""
@@ -252,6 +253,9 @@ gif_checkbox.pack(expand=True, fill="both")
 strict2_checkbox = Checkbutton(inside_output_options, text="-strict -2", variable=strict2)
 strict2_checkbox.pack(expand=True, fill="both")
 
+appendreversed_checkbox = Checkbutton(inside_output_options, text="append reversed", variable=append_reversed)
+appendreversed_checkbox.pack(expand=True, fill="both")
+
 inside_output_options.pack()
 
 # commandline groupbox
@@ -407,6 +411,10 @@ def update_command():
 	if strict2.get() == 1:
 		command += " -strict -2"
 
+	# now for some real ffmpeg magic
+	if append_reversed.get() == 1:
+		command += " -filter_complex \"[0:v]reverse,fifo[r];[0:v][r] concat=n=2:v=1 [v]\" -map \"[v]\""
+
 	# finally, output filename
 	command += " \"%s\"" % get_output_filename()
 
@@ -439,7 +447,8 @@ update_command_on_change_controls = [
 	enable_video_trim,
 	enable_time_trim,
 	gif_checkbox,
-	strict2_checkbox
+	strict2_checkbox,
+	appendreversed_checkbox
 ]
 
 for control in update_command_on_change_controls:
