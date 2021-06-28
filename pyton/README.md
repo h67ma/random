@@ -1,4 +1,5 @@
 * cue/tracklist_to_cue.pyw - converts tracklist from simple lyric style list to proper cuesheet
+* timer/timer.pyw - simple multi-timer with notifications
 * crop_png.py - splits spritemap to separate images using info from json
 * ffmpeg_lil_gui.pyw - simple gui for ffmpeg, only includes options that I usually use (trim video/trim time/gif/etc.). Not idiotproof.
 * onenote-to-md.py - converts OneNote notebooks to md using pandoc
