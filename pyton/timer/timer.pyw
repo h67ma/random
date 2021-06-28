@@ -7,7 +7,7 @@ from datetime import datetime
 # add some tabs at the end in case it doesn't line up in status
 TIMERS_DATA = [
 	(5*60, "Look away"),
-	(3*60*60, "Stand up")
+	(1*60*60, "Stand up"),
 ]
 
 
@@ -44,7 +44,7 @@ timers = []
 def timers_status():
 	status_str = ""
 	for timer in timers:
-		status_str += "%s:\t%s\n" % (timer.name, seconds_to_hh_mm_ss(timer.get_remaining_seconds()))
+		status_str += "%s\t%s\n" % (timer.name, seconds_to_hh_mm_ss(timer.get_remaining_seconds()))
 	icon.notify(status_str, title="Upcoming timers")
 
 
