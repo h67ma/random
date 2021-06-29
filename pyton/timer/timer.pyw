@@ -4,7 +4,6 @@ from PIL import Image, ImageDraw
 from datetime import datetime
 
 
-# add some tabs at the end in case it doesn't line up in status
 TIMERS_DATA = [
 	(5*60, "Look away"),
 	(1*60*60, "Stand up"),
@@ -44,11 +43,11 @@ timers = []
 def timers_status():
 	status_str = ""
 	for timer in timers:
-		status_str += "%s\t%s\n" % (timer.name, seconds_to_hh_mm_ss(timer.get_remaining_seconds()))
+		status_str += "%s\t%s (every %s)\n" % (seconds_to_hh_mm_ss(timer.get_remaining_seconds()), timer.name, seconds_to_hh_mm_ss(timer.duration))
 	icon.notify(status_str, title="Upcoming timers")
 
 
-def quit_window():
+def quit():
 	for timer in timers:
 		timer.cancel()
 	icon.stop()
@@ -63,7 +62,7 @@ draw.line([(1, 2), (14, 2)], width=4, fill="green")
 
 menu = Menu(
 	MenuItem("Timers status", timers_status, default=True),
-	MenuItem("Quit", quit_window)
+	MenuItem("Quit", quit)
 )
 
 icon = Icon("Simple Timer", image, "Simple Timer", menu)
