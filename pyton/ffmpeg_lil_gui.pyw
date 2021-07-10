@@ -75,12 +75,13 @@ audio_output = IntVar(value=0)
 gif = IntVar(value=0)
 strict2 = IntVar(value=0)
 append_reversed = IntVar(value=0)
+append_extra = StringVar()
 open_after_done = IntVar(value=1)
 
 command = ""
 
 # top layout
-root.columnconfigure(0, pad=10)
+root.columnconfigure(0, pad=10, weight=1)
 root.columnconfigure(1, pad=10)
 root.columnconfigure(2, pad=10)
 root.columnconfigure(3, pad=10, weight=1)
@@ -88,8 +89,9 @@ root.columnconfigure(3, pad=10, weight=1)
 root.rowconfigure(0, pad=10)
 root.rowconfigure(1, pad=10)
 root.rowconfigure(2, pad=10)
-root.rowconfigure(3, pad=10, weight=1)
-root.rowconfigure(4, pad=10)
+root.rowconfigure(3, pad=10)
+root.rowconfigure(4, pad=10, weight=1)
+root.rowconfigure(5, pad=10)
 
 # IO groupbox
 in_out_frame = LabelFrame(root, text="IO")
@@ -258,28 +260,36 @@ appendreversed_checkbox.pack(expand=True, fill="both")
 
 inside_output_options.pack()
 
+# append options
+append_options_frame = LabelFrame(root, text="Append options")
+
+append_box = Entry(append_options_frame, textvariable=append_extra)
+append_box.pack(expand=True, fill="both", padx=5, pady=5)
+
+append_options_frame.grid(row=3, column=0, columnspan=3, padx=5, sticky=N+E+W+S)
+
 # commandline groupbox
 status_frame = LabelFrame(root, text="Command line")
 
-command_box = ScrolledText(status_frame, wrap=WORD, height=10, width=60)
+command_box = ScrolledText(status_frame, wrap=WORD, height=10)
 command_box.pack(expand=True, fill="both", padx=5, pady=5)
 
-status_frame.grid(row=3, column=0, columnspan=3, sticky=N+E+W+S, padx=5)
+status_frame.grid(row=4, column=0, columnspan=3, padx=5, sticky=N+E+W+S)
 
 # run btn and open output checkbox
 run_btn = Button(root, text="Run")
-run_btn.grid(row=4, column=0, columnspan=2, sticky=N+E+W+S, padx=5, pady=(0, 5))
+run_btn.grid(row=5, column=0, columnspan=2, sticky=N+E+W+S, padx=5, pady=(0, 5))
 
 open_after_checkbox = Checkbutton(root, text="Open output after done", variable=open_after_done)
-open_after_checkbox.grid(row=4, column=2, padx=(0, 5), pady=(0, 5))
+open_after_checkbox.grid(row=5, column=2, padx=(0, 5), pady=(0, 5))
 
 # log groupbox
 log_frame = LabelFrame(root, text="Log")
 
-log_box = ScrolledText(log_frame, state=DISABLED, wrap=WORD, width=80)
+log_box = ScrolledText(log_frame, state=DISABLED, wrap=WORD)
 log_box.pack(expand=True, fill="both", padx=5, pady=5)
 
-log_frame.grid(row=1, column=3, rowspan=4, sticky=N+E+W+S, padx=5, pady=(0, 5))
+log_frame.grid(row=1, column=3, rowspan=5, sticky=N+E+W+S, padx=5, pady=(0, 5))
 
 
 def update_status(new_status):
@@ -415,6 +425,10 @@ def update_command():
 	if append_reversed.get() == 1:
 		command += " -filter_complex \"[0:v]reverse,fifo[r];[0:v][r] concat=n=2:v=1 [v]\" -map \"[v]\""
 
+	# append extra
+	if append_extra.get() != "":
+		command += ' ' + append_extra.get()
+
 	# finally, output filename
 	command += " \"%s\"" % get_output_filename()
 
@@ -471,7 +485,8 @@ update_command_on_text_change_controls = [
 	end_s,
 	end_ms,
 	video_output,
-	audio_output
+	audio_output,
+	append_extra
 ]
 
 for control in update_command_on_text_change_controls:
