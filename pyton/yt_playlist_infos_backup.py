@@ -176,7 +176,7 @@ for playlist in dumped_playlists:
 			video["addedToPlaylist"],
 			"??:??",
 			"<br />".join(["""<a href="%s">[%d]</a>""" % (thumb_url, i) for i, thumb_url in enumerate(video["thumbnails"])]),
-			video["description"]
+			video["description"].replace('\n', '<br />\n').replace('\r', '<br />\r')
 		)
 	
 	html_list += "</table></body></html>"
