@@ -5,3 +5,4 @@
 * onenote-to-md.py - converts OneNote notebooks to md using pandoc
 * world_scrambler.py - checks if you can make words out of letters laying around (good for custom laptop stickers)
 * translate_xml.py - translates text nodes in xml files with google translate
+* yt_playlist_infos_backup.py - backup your youtube playlists complete with most metadata and thumbnails
