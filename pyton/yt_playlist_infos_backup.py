@@ -7,7 +7,6 @@ import google_auth_oauthlib.flow
 import googleapiclient.discovery
 import googleapiclient.errors
 
-# does not list hidden/deleted videos at all :/
 # TODO also dump "saved" playlists - load list of manually prepared playlists from textfile
 
 def sanitize_filename_input(input: str) -> str:
