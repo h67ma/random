@@ -14,8 +14,6 @@ def sanitize_filename_input(input: str) -> str:
 
 
 root_dirname = "yt_playlists_dump_%s" % datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-print(root_dirname)
-root_dirname = "yt_playlists_dump"
 IMG_DIR = "imgs"
 img_dirname = os.path.join(root_dirname, IMG_DIR)
 html_dumps_dirname = os.path.join(root_dirname, "html")
