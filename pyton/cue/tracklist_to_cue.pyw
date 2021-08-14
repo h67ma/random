@@ -99,7 +99,7 @@ def save():
 
 	to_write = out_cue_box.get("1.0", END)
 
-	with open(cue_filename, "w", encoding="utf-8") as f_cue:
+	with open(cue_filename, "w", encoding="utf-8-sig") as f_cue:
 		f_cue.write(to_write)
 
 	update_status("Saved to %s" % cue_filename)
