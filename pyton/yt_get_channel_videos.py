@@ -6,9 +6,6 @@ from urllib.request import Request, urlopen
 VIDEOS_PER_PAGE = 50 # max allowed
 API_KEY_NAME = "yt_api_key.txt"
 
-def sanitize_filename(filename: str) -> str:
-	return re.sub("[^\w\-_\., \(\)[\]!'&+]", "_", filename)
-
 
 def make_channel_nfos_url(api_key, channel_id):
 	return "https://youtube.googleapis.com/youtube/v3/channels?part=contentDetails&id=%s&key=%s" % (channel_id, api_key)
@@ -36,7 +33,11 @@ channel_id = args.channel
 channel_req_url = make_channel_nfos_url(api_key, channel_id)
 req = Request(channel_req_url)
 response = json.loads(urlopen(req).read().decode())
-uploads_playlist_id = response["items"][0]["contentDetails"]["relatedPlaylists"]["uploads"]
+try:
+	uploads_playlist_id = response["items"][0]["contentDetails"]["relatedPlaylists"]["uploads"]
+except KeyError:
+	print("can't fetch channel data:", response)
+	exit()
 
 # get videos
 vedio_names = []
@@ -56,8 +57,7 @@ while True:
 
 # print or write results
 if args.file:
-	out_name = sanitize_filename(channel_id) + ".log"
-	with open(out_name, "w", encoding="UTF-8") as f:
+	with open("youtube.log", "w", encoding="UTF-8") as f:
 		for name in vedio_names:
 			f.write(name + '\n')
 else:
