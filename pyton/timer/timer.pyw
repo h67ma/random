@@ -2,12 +2,59 @@ from threading import Thread, Event
 from pystray import MenuItem, Icon, Menu
 from PIL import Image, ImageDraw
 from datetime import datetime
+from tkinter import Tk, Button, N, E, W, S
+import time
+import gc
 
+BLANK_SCREEN = True # False = show a notification
+BREAK_TIME = 5
 
 TIMERS_DATA = [
-	(5*60, "Look away"),
-	(1*60*60, "Stand up"),
+	(60, "Blink")
 ]
+
+class ScreenOverlay(Tk):
+	"""Displays a black screen with white, centered text and a countdown timer.
+	The window will be dismissed on mouse click or after break_time_s elapses."""
+
+	def __init__(self, screen_text, break_time_s):
+		Tk.__init__(self)
+		self.start_time = time.time()
+		self.screen_text = screen_text
+		self.break_time_s = break_time_s
+
+		self.configure(bg="black")
+		self.columnconfigure(0, weight=1)
+		self.rowconfigure(0, weight=1)
+		self.title("A little break for your eyes")
+		self.attributes("-fullscreen", True)
+		self.attributes("-topmost", True)
+
+		self.btn = Button(self, bg="black", fg="white", border=0, font=("Arial", 25), command=self.destroy)
+		self.btn.grid(sticky=N+E+W+S)
+
+		self.timeout_after_id = self.after(break_time_s*1000, self.destroy)
+		self.update_btn_rec()
+
+	def update_btn_rec(self):
+		remaining_s = self.break_time_s - int(time.time() - self.start_time)
+		self.btn.configure(text="%s\n(%d)" % (self.screen_text, remaining_s))
+		self.timer_after_id = self.after(1000, self.update_btn_rec)
+
+	def destroy(self):
+		# clear timers & kill yourself
+		self.after_cancel(self.timeout_after_id)
+		self.after_cancel(self.timer_after_id)
+		Tk.destroy(self) # dead and cold, a story told!
+
+
+def show_screen_overlay(screen_text):
+	overlay = ScreenOverlay(screen_text, BREAK_TIME)
+	overlay.mainloop()
+
+	# gc badness to avoid spooky multithreading errors
+	overlay = None
+	gc.collect()
 
 
 def seconds_to_hh_mm_ss(seconds: int) -> str:
@@ -55,6 +102,7 @@ def quit():
 
 #image = Image.open("eyeball.png")
 
+# default icon
 image = Image.new("RGB", (16, 16), color = "black")
 draw = ImageDraw.Draw(image)
 draw.line([(7, 1), (7, 14)], width=4, fill="green")
@@ -67,8 +115,13 @@ menu = Menu(
 
 icon = Icon("Simple Timer", image, "Simple Timer", menu)
 
+if BLANK_SCREEN:
+	action = show_screen_overlay
+else:
+	action = icon.notify
+
 for timer_data in TIMERS_DATA:
-	timer = PerpetualTimer(timer_data[0], icon.notify, timer_data[1])
+	timer = PerpetualTimer(timer_data[0], action, timer_data[1])
 	timers.append(timer)
 	timer.start()
 
