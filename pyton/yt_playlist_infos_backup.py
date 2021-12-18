@@ -7,7 +7,8 @@ import google_auth_oauthlib.flow
 import googleapiclient.discovery
 import googleapiclient.errors
 
-# TODO also dump "saved" playlists - load list of manually prepared playlists from textfile
+# TODO also dump "saved" playlists - must load list of manually prepared playlist urls from textfile
+# TODO video duration
 
 def sanitize_filename_input(input: str) -> str:
 	return re.sub("[^\w\-_\., \(\)[\]!'&+]", "_", input)
