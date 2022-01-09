@@ -1,0 +1,86 @@
+name = moon
+file_extensions [] = moon;
+
+styles [] {
+	.text : style {
+		color = brown
+		textmate_scope	= text
+	}
+
+	.phoneme : style {
+		color = cyan
+		textmate_scope = keyword
+	}
+
+	.numeric : style {
+		color = green
+		textmate_scope = constant.numeric
+	}
+
+	.number_tuple_punct : style {
+		color = red_2
+		textmate_scope = punctuation.definition.tag
+	}
+
+	.phoneme_sequence_punct : style {
+		color = pink
+		textmate_scope = support.class punctuation
+	}
+
+	.illegal : style {
+		color = white
+		background_color = red
+		textmate_scope = invalid
+	}
+}
+
+contexts [] {
+	main : context {
+		: include "illegal_length";
+		: include "note_sequence";
+		: include "text";
+		: include "illegal";
+	}
+
+	illegal_length : context {
+		: pattern {
+			regex \= (.{129,})
+			styles [] = .illegal;
+		}
+	}
+
+	illegal : context {
+		: pattern {
+			regex \= ([^\s])
+			styles [] = .illegal;
+		}
+	}
+
+	text : context {
+		: pattern {
+			regex \= ([^\[\]])
+			styles [] = .text;
+		}
+	}
+
+	note_sequence : context {
+		: inline_push {
+			regex \= (\[)
+			styles [] = .phoneme_sequence_punct;
+			: pop {
+				regex \= (\])
+				styles [] = .phoneme_sequence_punct;
+			}
+			: include "phoneme_len_and_pitch";
+			: include "illegal";
+		}
+	}
+
+	phoneme_len_and_pitch : context {
+		: pattern {
+			regex \= ([a-z'_]+)(<)(\d+)(,)(\d+)(>)
+			styles [] = .phoneme, .number_tuple_punct, .numeric, .number_tuple_punct, .numeric, .number_tuple_punct;
+		}
+		: include "illegal";
+	}
+}

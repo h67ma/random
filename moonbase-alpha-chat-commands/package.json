@@ -1,0 +1,22 @@
+{
+	"name": "moonbase-alpha-chat-commands",
+	"displayName": "Moonbase Alpha Chat Commands",
+	"version": "0.0.1",
+	"engines": {
+		"vscode": ">=0.9.0-pre.1"
+	},
+	"publisher": "John Madden",
+	"description": "A very basic syntax highlighter for writing Moonbase Alpha songs.",
+	"contributes": {
+		"languages": [{
+			"id": "moonbase-alpha-chat-commands",
+			"aliases": ["Moon", "moon"],
+			"extensions": [".moon"]
+		}],
+		"grammars": [{
+			"language": "moonbase-alpha-chat-commands",
+			"scopeName": "source.moon",
+			"path": "./syntaxes/moon.plist"
+		}]
+	}
+}
