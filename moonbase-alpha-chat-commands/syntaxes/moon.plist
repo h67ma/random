@@ -32,11 +32,68 @@
         </dict>
         <dict>
           <key>include</key>
-          <string>#note_sequence</string>
+          <string>#chat_command</string>
         </dict>
         <dict>
           <key>include</key>
           <string>#text</string>
+        </dict>
+        <dict>
+          <key>include</key>
+          <string>#illegal</string>
+        </dict>
+       </array>
+    </dict>
+    <key>chat_command</key>
+    <dict>
+      <key>patterns</key>
+      <array> 
+        <dict>
+          <key>begin</key>
+          <string>(\[)</string>
+          <key>beginCaptures</key>
+          <dict>
+            <key>1</key>
+            <dict>
+              <key>name</key>
+              <string>support.class punctuation.moon</string>
+            </dict>
+          </dict>
+          <key>patterns</key>
+          <array> 
+            <dict>
+              <key>include</key>
+              <string>#chat_command__1</string>
+            </dict>
+           </array>
+          <key>end</key>
+          <string>(\])</string>
+          <key>endCaptures</key>
+          <dict>
+            <key>1</key>
+            <dict>
+              <key>name</key>
+              <string>support.class punctuation.moon</string>
+            </dict>
+          </dict>
+        </dict>
+       </array>
+    </dict>
+    <key>chat_command__1</key>
+    <dict>
+      <key>patterns</key>
+      <array> 
+        <dict>
+          <key>include</key>
+          <string>#phoneme_len_and_pitch</string>
+        </dict>
+        <dict>
+          <key>include</key>
+          <string>#phoneme_len</string>
+        </dict>
+        <dict>
+          <key>include</key>
+          <string>#voice_selection</string>
         </dict>
         <dict>
           <key>include</key>
@@ -68,52 +125,36 @@
         </dict>
        </array>
     </dict>
-    <key>note_sequence</key>
+    <key>phoneme_len</key>
     <dict>
       <key>patterns</key>
       <array> 
         <dict>
-          <key>begin</key>
-          <string>(\[)</string>
-          <key>beginCaptures</key>
+          <key>match</key>
+          <string>([a-z\x{0027}_]+)(&lt;)(\d+)(&gt;)</string>
+          <key>captures</key>
           <dict>
             <key>1</key>
             <dict>
               <key>name</key>
-              <string>support.class.punctuation.moon</string>
+              <string>keyword.moon</string>
             </dict>
-          </dict>
-          <key>patterns</key>
-          <array> 
-            <dict>
-              <key>include</key>
-              <string>#note_sequence__1</string>
-            </dict>
-           </array>
-          <key>end</key>
-          <string>(\])</string>
-          <key>endCaptures</key>
-          <dict>
-            <key>1</key>
+            <key>2</key>
             <dict>
               <key>name</key>
-              <string>support.class.punctuation.moon</string>
+              <string>punctuation.definition.tag.moon</string>
+            </dict>
+            <key>3</key>
+            <dict>
+              <key>name</key>
+              <string>constant.numeric.moon</string>
+            </dict>
+            <key>4</key>
+            <dict>
+              <key>name</key>
+              <string>punctuation.definition.tag.moon</string>
             </dict>
           </dict>
-        </dict>
-       </array>
-    </dict>
-    <key>note_sequence__1</key>
-    <dict>
-      <key>patterns</key>
-      <array> 
-        <dict>
-          <key>include</key>
-          <string>#phoneme_len_and_pitch</string>
-        </dict>
-        <dict>
-          <key>include</key>
-          <string>#illegal</string>
         </dict>
        </array>
     </dict>
@@ -158,10 +199,6 @@
             </dict>
           </dict>
         </dict>
-        <dict>
-          <key>include</key>
-          <string>#illegal</string>
-        </dict>
        </array>
     </dict>
     <key>text</key>
@@ -173,6 +210,18 @@
           <string>([^\[\]])</string>
           <key>name</key>
           <string>text.moon</string>
+        </dict>
+       </array>
+    </dict>
+    <key>voice_selection</key>
+    <dict>
+      <key>patterns</key>
+      <array> 
+        <dict>
+          <key>match</key>
+          <string>(:[a-z]{2})</string>
+          <key>name</key>
+          <string>support.class punctuation.moon</string>
         </dict>
        </array>
     </dict>
