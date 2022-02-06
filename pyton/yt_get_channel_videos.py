@@ -7,6 +7,7 @@ VIDEOS_PER_PAGE = 50 # max allowed
 API_KEY_NAME = "yt_api_key.txt"
 
 
+# note: youtube api supports quering by username, but it doesn't seem to work :/
 def make_channel_nfos_url(api_key, channel_id):
 	return "https://youtube.googleapis.com/youtube/v3/channels?part=contentDetails&id=%s&key=%s" % (channel_id, api_key)
 

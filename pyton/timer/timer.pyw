@@ -2,20 +2,25 @@ from threading import Thread, Event
 from pystray import MenuItem, Icon, Menu
 from PIL import Image, ImageDraw
 from datetime import datetime
-from tkinter import Tk, Button, N, E, W, S
+from tkinter import Tk, Button, N, E, W, S, Toplevel
 import time
 import gc
 
 BLANK_SCREEN = True # False = show a notification
-BREAK_TIME = 5
+BREAK_TIME = 2
 
 TIMERS_DATA = [
 	(60, "Blink")
 ]
 
+# add coordinates of each screen. each needs to point anywhere on a given screen
+SCREEN_OFFSETS = [
+	(0, 0),
+]
+
 class ScreenOverlay(Tk):
-	"""Displays a black screen with white, centered text and a countdown timer.
-	The window will be dismissed on mouse click or after break_time_s elapses."""
+	"""Displays black screens with white, centered text and a countdown timer.
+	The windows will be dismissed on mouse click or after break_time_s elapses."""
 
 	def __init__(self, screen_text, break_time_s):
 		Tk.__init__(self)
@@ -23,22 +28,33 @@ class ScreenOverlay(Tk):
 		self.screen_text = screen_text
 		self.break_time_s = break_time_s
 
-		self.configure(bg="black")
-		self.columnconfigure(0, weight=1)
-		self.rowconfigure(0, weight=1)
-		self.title("A little break for your eyes")
-		self.attributes("-fullscreen", True)
-		self.attributes("-topmost", True)
+		self.buttons = []
+		for offset in SCREEN_OFFSETS:
+			# create a window for each screen
+			win = Toplevel()
+			win.geometry("100x100+%d+%d" % (offset[0], offset[1])) # size doesn't matter as it will be maximized anyway
+			win.configure(bg="black")
+			win.columnconfigure(0, weight=1)
+			win.rowconfigure(0, weight=1)
+			win.title("A little break for your eyes")
+			#win.attributes("-fullscreen", True) # doesn't work for whatever reason
+			win.state("zoomed")
+			win.overrideredirect(True)
+			win.attributes("-topmost", True)
 
-		self.btn = Button(self, bg="black", fg="white", border=0, font=("Arial", 25), command=self.destroy)
-		self.btn.grid(sticky=N+E+W+S)
+			btn = Button(win, bg="black", fg="white", border=0, font=("Arial", 25), command=self.destroy)
+			btn.grid(sticky=N+E+W+S)
+			self.buttons.append(btn)
+
+		self.withdraw() # hide the empty root window
 
 		self.timeout_after_id = self.after(break_time_s*1000, self.destroy)
 		self.update_btn_rec()
 
 	def update_btn_rec(self):
 		remaining_s = self.break_time_s - int(time.time() - self.start_time)
-		self.btn.configure(text="%s\n(%d)" % (self.screen_text, remaining_s))
+		for btn in self.buttons:
+			btn.configure(text="%s\n(%d)" % (self.screen_text, remaining_s))
 		self.timer_after_id = self.after(1000, self.update_btn_rec)
 
 	def destroy(self):
