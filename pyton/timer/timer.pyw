@@ -13,9 +13,11 @@ TIMERS_DATA = [
 	(60, "Blink")
 ]
 
-# add coordinates of each screen. each needs to point anywhere on a given screen
-SCREEN_OFFSETS = [
-	(0, 0),
+# add coordinates of each screen which should show the overlay
+# w, h, x, y
+# find x & y e.g. with pyautogui.position() or via printscreen
+SCREEN_GEOMETRIES = [
+	(2560, 1440, 0, 0),
 ]
 
 class ScreenOverlay(Tk):
@@ -29,16 +31,17 @@ class ScreenOverlay(Tk):
 		self.break_time_s = break_time_s
 
 		self.buttons = []
-		for offset in SCREEN_OFFSETS:
+		for geo in SCREEN_GEOMETRIES:
 			# create a window for each screen
 			win = Toplevel()
-			win.geometry("100x100+%d+%d" % (offset[0], offset[1])) # size doesn't matter as it will be maximized anyway
+			win.geometry("%dx%d+%d+%d" % (geo[0], geo[1], geo[2], geo[3]))
 			win.configure(bg="black")
 			win.columnconfigure(0, weight=1)
 			win.rowconfigure(0, weight=1)
-			win.title("A little break for your eyes")
-			#win.attributes("-fullscreen", True) # doesn't work for whatever reason
-			win.state("zoomed")
+			win.title(screen_text)
+			#win.attributes("-fullscreen", True) # makes all windows show fullscreen on the main screen
+			#win.state("zoomed") # steals focus - unacceptable
+			#win.attributes("-disabled", True) # makes the window unclickable and not stealing focus, but then can't press the button
 			win.overrideredirect(True)
 			win.attributes("-topmost", True)
 
