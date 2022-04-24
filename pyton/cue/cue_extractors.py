@@ -1,7 +1,7 @@
 import re
 
 def extract_mm_ss(line):
-	matches = re.findall(r"^\[?(\d+):(\d+)\]?\s*([^-]+ - )?(.+)?$", line)
+	matches = re.findall(r"^\[?(\d+):(\d+)\]?\s*(.+ - )?(.+)?$", line)
 	if len(matches) != 1:
 		return None
 	matches = matches[0]
@@ -13,7 +13,7 @@ def extract_mm_ss(line):
 
 
 def extract_hh_mm_ss(line):
-	matches = re.findall(r"^\[?(\d+):(\d+):(\d+)\]?\s*([^-]+ - )?(.+)?$", line)
+	matches = re.findall(r"^\[?(\d+):(\d+):(\d+)\]?\s*(.+ - )?(.+)?$", line)
 	if len(matches) != 1:
 		return None
 	matches = matches[0]
@@ -25,7 +25,7 @@ def extract_hh_mm_ss(line):
 
 
 def extract_mm_ss_ms(line):
-	matches = re.findall(r"^\[?(\d+):(\d+)\.(\d+)\]?\s*([^-]+ - )?(.+)?$", line)
+	matches = re.findall(r"^\[?(\d+):(\d+)\.(\d+)\]?\s*(.+ - )?(.+)?$", line)
 	if len(matches) != 1:
 		return None
 	matches = matches[0]
@@ -38,7 +38,7 @@ def extract_mm_ss_ms(line):
 
 
 def extract_hh_mm_ss_ms(line):
-	matches = re.findall(r"^\[?(\d+):(\d+):(\d+)\.(\d+)\]?\s*([^-]+ - )?(.+)?$", line)
+	matches = re.findall(r"^\[?(\d+):(\d+):(\d+)\.(\d+)\]?\s*(.+ - )?(.+)?$", line)
 	if len(matches) != 1:
 		return None
 	matches = matches[0]

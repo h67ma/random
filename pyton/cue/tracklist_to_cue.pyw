@@ -1,4 +1,3 @@
-import sys
 import os
 from tkinter import StringVar, N, E, W, S, WORD, LEFT, RIGHT, Text, filedialog, END, INSERT
 from tkinter.ttk import Frame, LabelFrame, Label, Entry, Scrollbar, Button
