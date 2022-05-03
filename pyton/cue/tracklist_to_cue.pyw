@@ -57,6 +57,7 @@ def translate_to_cue():
 	cue += "FILE \"%s\" WAVE\n" % track_name
 	i = 0
 	errors = 0
+	no_artist_cnt = 0
 	for line in tracklist:
 		line = line.strip()
 		if line == "":
@@ -71,7 +72,13 @@ def translate_to_cue():
 				ss = result[1]
 				ms = result[2]
 				artist = result[3]
-				artist_line = "\n    PERFORMER " + artist if artist != "" else ""
+
+				if artist == "":
+					no_artist_cnt += 1
+					artist_line = ""
+				else:
+					artist_line = "\n    PERFORMER " + artist
+
 				title = result[4]
 				found = True
 				break
@@ -83,10 +90,14 @@ def translate_to_cue():
 			continue
 
 		cue += "  TRACK %02d AUDIO%s\n    TITLE %s\n    INDEX 01 %02d:%02d:%02d\n" % (i, artist_line, title, mm, ss, ms)
+
 	if errors > 0:
 		update_status("Completed with %d errors (see console), pls fix cuesheet manually" % errors)
 	else:
-		update_status("All tracks parsed successfully")
+		if no_artist_cnt > 0:
+			update_status("All tracks parsed successfully. %d tracks are missing artist name." % no_artist_cnt)
+		else:
+			update_status("All tracks parsed successfully")
 	update_out_cue(cue)
 
 
