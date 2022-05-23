@@ -302,10 +302,16 @@ def set_command_text(new_text):
 
 
 def append_log_text(new_line):
-	log_box.configure(state=NORMAL) # cringe
+	log_box.configure(state=NORMAL)
 	log_box.insert(END, new_line)
-	log_box.configure(state=DISABLED) # cringe 2
+	log_box.configure(state=DISABLED)
 	log_box.yview(END) # scroll to bottom
+
+
+def clear_log_text():
+	log_box.configure(state=NORMAL)
+	log_box.delete("1.0", END)
+	log_box.configure(state=DISABLED)
 
 
 def select_input_file(in_txt_control):
@@ -446,6 +452,7 @@ def get_output_filename():
 
 
 def run():
+	clear_log_text()
 	update_status("Running ffmpeg, pls wait...")
 	command = command_box.get("1.0", END)
 	threading.Thread(target=run_ffmpeg_thread, args=(command,)).start()
