@@ -18,7 +18,7 @@ function sancho_prompt_char {
 function sancho_git_status {
 	local branch=$(git_current_branch)
 	if [ "$branch" != "" ]; then
-		echo " %{$fg[green]%}($(git_current_branch)%{$fg[red]%}$(git_prompt_status)%{$fg[green]%})"
+		echo " %{$fg[green]%}(%{$branch%}%{$fg[red]%}$(git_prompt_status)%{$fg[green]%})"
 	fi
 }
 
