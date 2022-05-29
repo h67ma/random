@@ -1,5 +1,7 @@
 import os
-from tkinter import StringVar, N, E, W, S, WORD, LEFT, RIGHT, Text, filedialog, END, INSERT
+from PIL import Image, ImageDraw
+from PIL.ImageTk import PhotoImage
+from tkinter import StringVar, N, E, W, S, WORD, Text, filedialog, END, INSERT
 from tkinter.ttk import Frame, LabelFrame, Label, Entry, Scrollbar, Button
 from tkinterdnd2 import TkinterDnD, DND_FILES
 from cue_extractors import line_extractors
@@ -7,6 +9,16 @@ from cue_extractors import line_extractors
 
 root = TkinterDnD.Tk()
 root.title("tracklist to cue")
+
+try:
+	image = Image.open("icon.png")
+except:
+	# fallback icon, hand drawn
+	image = Image.new("RGBA", (64, 64), color=None)
+	draw = ImageDraw.Draw(image)
+	draw.arc([(2, 2), (61, 61)], 60, 300, width=10, fill="red")
+
+root.iconphoto(False, PhotoImage(image))
 
 # data
 in_track_name_txt = StringVar()

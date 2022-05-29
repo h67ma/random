@@ -2,6 +2,8 @@ import os
 import threading
 import subprocess
 import sys
+from PIL import Image, ImageDraw
+from PIL.ImageTk import PhotoImage
 from tkinter import Tk, StringVar, IntVar, filedialog, N, E, W, S, CENTER, INSERT, WORD, END, DISABLED, NORMAL
 from tkinter.ttk import Frame, LabelFrame, Label, Button, Checkbutton, Entry, Radiobutton
 from tkinterdnd2 import TkinterDnD, DND_FILES
@@ -48,6 +50,18 @@ def drop_out(event):
 
 root = TkinterDnD.Tk()
 root.title("lil ffmpeg helper")
+
+try:
+	image = Image.open("icon.png")
+except:
+	# fallback icon, hand drawn
+	image = Image.new("RGBA", (16, 16), color=None)
+	draw = ImageDraw.Draw(image)
+	draw.line([(4, 2), (10, 2)], width=3, fill="green")
+	draw.line([(4, 2), (4, 12)], width=3, fill="green")
+	draw.line([(4, 7), (8, 7)], width=3, fill="green")
+
+root.iconphoto(False, PhotoImage(image))
 
 # data
 in_txt1 = StringVar()
