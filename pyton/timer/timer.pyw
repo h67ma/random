@@ -119,13 +119,14 @@ def quit():
 	icon.stop()
 
 
-#image = Image.open("eyeball.png")
-
-# default icon
-image = Image.new("RGB", (16, 16), color = "black")
-draw = ImageDraw.Draw(image)
-draw.line([(7, 1), (7, 14)], width=4, fill="green")
-draw.line([(1, 2), (14, 2)], width=4, fill="green")
+try:
+	image = Image.open("icon.png")
+except:
+	# fallback icon, hand drawn
+	image = Image.new("RGBA", (16, 16), color=None)
+	draw = ImageDraw.Draw(image)
+	draw.line([(7, 1), (7, 14)], width=4, fill="green")
+	draw.line([(1, 2), (14, 2)], width=4, fill="green")
 
 menu = Menu(
 	MenuItem("Timers status", timers_status, default=True),
