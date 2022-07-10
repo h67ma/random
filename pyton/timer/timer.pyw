@@ -45,7 +45,7 @@ class ScreenOverlay(Tk):
 			win.overrideredirect(True)
 			win.attributes("-topmost", True)
 
-			btn = Button(win, bg="black", fg="white", activebackground="black", activeforeground="white", border=0, font=("Arial", 25), command=self.destroy)
+			btn = Button(win, bg="black", fg="white", activebackground="black", activeforeground="white", borderwidth=0, highlightthickness=0, font=("Arial", 25), command=self.destroy)
 			btn.grid(sticky=N+E+W+S)
 			self.buttons.append(btn)
 
