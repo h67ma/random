@@ -7,11 +7,6 @@ VIDEOS_PER_PAGE = 50 # max allowed
 API_KEY_NAME = "yt_api_key.txt"
 
 
-# note: youtube api supports quering by username, but it doesn't seem to work :/
-def make_channel_nfos_url(api_key, channel_id):
-	return "https://youtube.googleapis.com/youtube/v3/channels?part=contentDetails&id=%s&key=%s" % (channel_id, api_key)
-
-
 def make_uploads_req_url(api_key, playlist_id, next_page_token):
 	uploads_req_url = "https://youtube.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=%d&playlistId=%s&key=%s" % (VIDEOS_PER_PAGE, playlist_id, api_key)
 	if next_page_token is not None:
@@ -25,13 +20,12 @@ with open(API_KEY_NAME, "r") as f:
 
 # parse args
 parser = argparse.ArgumentParser()
-parser.add_argument("-c", "--channel", action="store", required=True, type=str, help=("Youtube channel id"))
+parser.add_argument("-c", "--channel", action="store", required=True, type=str, help=("Youtube channel name"))
 parser.add_argument("-f", "--file", action="store_true", help=("Write results to file instead of stdout"))
 args = parser.parse_args()
-channel_id = args.channel
 
 # get uploads playlist id from channel infos
-channel_req_url = make_channel_nfos_url(api_key, channel_id)
+channel_req_url = "https://youtube.googleapis.com/youtube/v3/channels?part=contentDetails&forUsername=%s&key=%s" % (args.channel, api_key)
 req = Request(channel_req_url)
 response = json.loads(urlopen(req).read().decode())
 try:
