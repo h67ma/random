@@ -20,12 +20,19 @@ with open(API_KEY_NAME, "r") as f:
 
 # parse args
 parser = argparse.ArgumentParser()
-parser.add_argument("-c", "--channel", action="store", required=True, type=str, help=("Youtube channel name"))
+parser.add_argument("-c", "--channel", action="store", type=str, help=("Youtube channel name"))
+parser.add_argument("-i", "--id", action="store", type=str, help=("Youtube channel id"))
 parser.add_argument("-f", "--file", action="store_true", help=("Write results to file instead of stdout"))
 args = parser.parse_args()
 
+assert args.id is not None or args.channel is not None
+
 # get uploads playlist id from channel infos
-channel_req_url = "https://youtube.googleapis.com/youtube/v3/channels?part=contentDetails&forUsername=%s&key=%s" % (args.channel, api_key)
+if args.id is not None:
+	channel_req_url = "https://youtube.googleapis.com/youtube/v3/channels?part=contentDetails&id=%s&key=%s" % (args.id, api_key)
+elif args.channel is not None:
+	channel_req_url = "https://youtube.googleapis.com/youtube/v3/channels?part=contentDetails&forUsername=%s&key=%s" % (args.channel, api_key)
+
 req = Request(channel_req_url)
 response = json.loads(urlopen(req).read().decode())
 try:
