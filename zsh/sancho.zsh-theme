@@ -22,4 +22,4 @@ function sancho_git_status {
 	fi
 }
 
-PROMPT='%{$fg[white]%}[%*]%(?,, %{$fg[red]%}X) %{$fg[green]%}%n%{$fg[magenta]%}@%{$fg[cyan]%}%m %{$fg_bold[blue]%}%~%{$reset_color%}$(sancho_git_status) %{$fg[yellow]%}$(sancho_prompt_char)%{$reset_color%} '
+PROMPT='%(?,, %{$fg[red]%}X )%{$fg[green]%}%n%{$fg[magenta]%}@%{$fg[cyan]%}%m %{$fg_bold[blue]%}%~%{$reset_color%}$(sancho_git_status) %{$fg[yellow]%}$(sancho_prompt_char)%{$reset_color%} '
