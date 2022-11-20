@@ -5,25 +5,12 @@ from datetime import datetime
 from tkinter import Tk, Button, N, E, W, S, Toplevel
 import time
 import gc
-import os
-import re
+from screeninfo import get_monitors
 
 BLANK_SCREEN = True # False = show a notification
 BREAK_TIME = 2
 
-geometries = []
-if os.name == "posix":
-	for line in os.popen("xrandr --listactivemonitors").readlines()[1:]:
-		found = re.findall("(\d+)/\d+x(\d+)/\d+\+(\d+)\+(\d+)", line)
-		if len(found) == 1 and len(found[0]) == 4:
-			geometries.append([int(val) for val in found[0]])
-#elif os.name == "nt": # TODO
-#	
-else:
-	# add coordinates of each screen which should show the overlay
-	# w, h, x, y
-	# find x & y e.g. with pyautogui.position() or via printscreen
-	geometries.append((2560, 1440, 0, 0))
+geometries = [(mon.width, mon.height, mon.x, mon.y) for mon in get_monitors()]
 
 TIMERS_DATA = [
 	(60, "Blink")
