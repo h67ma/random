@@ -386,7 +386,14 @@ def run_ffmpeg_thread(command):
 	if retcode == 0:
 		update_status("Success")
 		if open_after_done.get() == 1:
-			retcode = subprocess.call("\"%s\"" % get_output_filename(), shell=True)
+			path = get_output_filename()
+
+			if sys.platform == "win32":
+				retcode = subprocess.call("\"%s\"" % path, shell=True) # trickery up my sleeve I tell you
+			else:
+				opener = "open" if sys.platform == "darwin" else "xdg-open"
+				retcode = subprocess.call([opener, path])
+
 			if retcode != 0:
 				update_status("Can't open output")
 	else:
