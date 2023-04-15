@@ -7,8 +7,8 @@ import google_auth_oauthlib.flow
 import googleapiclient.discovery
 import googleapiclient.errors
 
-# TODO also dump "saved" playlists - must load list of manually prepared playlist urls from textfile
-# TODO video duration
+# TODO also dump "saved" playlists, i.e. from other channels - worst case input a textfile with list of playlist ids to query
+# TODO video duration - after everything is done, go through all videos and call video list details (multiple ids)
 
 def sanitize_filename_input(input: str) -> str:
 	return re.sub("[^\w\-_\., \(\)[\]!'&+]", "_", input)
@@ -28,6 +28,8 @@ scopes = ["https://www.googleapis.com/auth/youtube.readonly"]
 
 # authenticate and create api bobject
 flow = google_auth_oauthlib.flow.InstalledAppFlow.from_client_secrets_file(CLIENT_SECRETS_FILE, scopes)
+
+# if authorization fails with 400 "something went wrong", login in chromium
 credentials = flow.run_console()
 youtube = googleapiclient.discovery.build("youtube", "v3", credentials=credentials)
 
