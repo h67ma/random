@@ -401,7 +401,7 @@ def run_ffmpeg_thread(command):
 
 
 def update_command():
-	command = "ffmpeg" # it's a start
+	command = "ffmpeg -hide_banner" # it's a start
 
 	# input file(s)
 	in_filename1 = in_txt1.get()
