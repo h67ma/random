@@ -1,5 +1,7 @@
 javascript:
 {
+	document.getElementById("ytd-player").style.borderRadius = 0;
+
 	let muda = [
 		"ytp-chrome-bottom",
 		"ytp-gradient-bottom",
