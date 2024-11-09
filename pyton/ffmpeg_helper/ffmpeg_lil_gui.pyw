@@ -89,6 +89,12 @@ audio_output = IntVar(value=0)
 gif = IntVar(value=0)
 strict2 = IntVar(value=0)
 append_reversed = IntVar(value=0)
+split_enable = IntVar(value=0)
+split_duration_h = IntVar(value=0)
+split_duration_m = IntVar(value=0)
+split_duration_s = IntVar(value=0)
+split_duration_ms = IntVar(value=0)
+split_reset_timestamps = IntVar(value=0)
 append_extra = StringVar()
 open_after_done = IntVar(value=1)
 
@@ -96,16 +102,16 @@ command = ""
 
 # top layout
 root.columnconfigure(0, pad=10, weight=1)
-root.columnconfigure(1, pad=10)
-root.columnconfigure(2, pad=10)
-root.columnconfigure(3, pad=10, weight=1)
+root.columnconfigure(1, pad=10, weight=1)
+root.columnconfigure(2, pad=10, weight=2)
 
 root.rowconfigure(0, pad=10)
 root.rowconfigure(1, pad=10)
 root.rowconfigure(2, pad=10)
 root.rowconfigure(3, pad=10)
-root.rowconfigure(4, pad=10, weight=1)
-root.rowconfigure(5, pad=10)
+root.rowconfigure(4, pad=10)
+root.rowconfigure(5, pad=10, weight=1)
+root.rowconfigure(6, pad=10)
 
 # IO groupbox
 in_out_frame = LabelFrame(root, text="IO")
@@ -187,7 +193,7 @@ inside_trim_video.pack()
 
 # trim time groupbox
 trim_time_frame = LabelFrame(root, text="Trim time")
-trim_time_frame.grid(row=1, column=1, columnspan=2, sticky=N+E+W+S, padx=(0, 5))
+trim_time_frame.grid(row=1, column=1, sticky=N+E+W+S, padx=(0, 5))
 
 inside_trim_time = Frame(trim_time_frame)
 
@@ -243,7 +249,7 @@ Radiobutton(inside_video_output, text="Default", variable=video_output, value=0)
 Radiobutton(inside_video_output, text="Disabled", variable=video_output, value=1).pack(expand=True, fill="both")
 Radiobutton(inside_video_output, text="Copy", variable=video_output, value=2).pack(expand=True, fill="both")
 
-inside_video_output.pack()
+inside_video_output.pack(anchor=W, padx=5)
 
 # audio output
 output_audio_frame = LabelFrame(root, text="Audio output")
@@ -255,11 +261,11 @@ Radiobutton(inside_audio_output, text="Default", variable=audio_output, value=0)
 Radiobutton(inside_audio_output, text="Disabled", variable=audio_output, value=1).pack(expand=True, fill="both")
 Radiobutton(inside_audio_output, text="Copy", variable=audio_output, value=2).pack(expand=True, fill="both")
 
-inside_audio_output.pack()
+inside_audio_output.pack(anchor=W, padx=5)
 
 # extra options groupbox
 output_options_frame = LabelFrame(root, text="Extra options")
-output_options_frame.grid(row=2, column=2, sticky=N+E+W+S, padx=(0, 5))
+output_options_frame.grid(row=3, column=1, sticky=N+E+W+S, padx=(0, 5))
 
 inside_output_options = Frame(output_options_frame)
 
@@ -272,7 +278,41 @@ strict2_checkbox.pack(expand=True, fill="both")
 appendreversed_checkbox = Checkbutton(inside_output_options, text="append reversed", variable=append_reversed)
 appendreversed_checkbox.pack(expand=True, fill="both")
 
-inside_output_options.pack()
+inside_output_options.pack(anchor=W, padx=5)
+
+# split groupbox
+split_opts_frame = LabelFrame(root, text="Split options (use %03d or similar in filename)")
+split_opts_frame.grid(row=3, column=0, sticky=N+E+W+S, padx=5)
+
+inside_output_options = Frame(split_opts_frame)
+
+split_enable_checkbox = Checkbutton(inside_output_options, text="Enable", variable=split_enable)
+split_enable_checkbox.pack(expand=True, fill="both")
+
+inside_inside_output_options = Frame(inside_output_options)
+inside_inside_output_options.rowconfigure(0, pad=10)
+inside_inside_output_options.columnconfigure(0, pad=10)
+inside_inside_output_options.columnconfigure(1, pad=10)
+inside_inside_output_options.columnconfigure(2, pad=10)
+inside_inside_output_options.columnconfigure(3, pad=10)
+inside_inside_output_options.columnconfigure(4, pad=10)
+inside_inside_output_options.columnconfigure(5, pad=10)
+inside_inside_output_options.columnconfigure(6, pad=10)
+inside_inside_output_options.columnconfigure(7, pad=10)
+Label(inside_inside_output_options, text="Duration: ").grid(row=0, column=0)
+Entry(inside_inside_output_options, textvariable=split_duration_h, width=3, justify=CENTER).grid(row=0, column=1, sticky=N+E+W+S)
+Label(inside_inside_output_options, text=":").grid(row=0, column=2)
+Entry(inside_inside_output_options, textvariable=split_duration_m, width=3, justify=CENTER).grid(row=0, column=3, sticky=N+E+W+S)
+Label(inside_inside_output_options, text=":").grid(row=0, column=4)
+Entry(inside_inside_output_options, textvariable=split_duration_s, width=3, justify=CENTER).grid(row=0, column=5, sticky=N+E+W+S)
+Label(inside_inside_output_options, text=".").grid(row=0, column=6)
+Entry(inside_inside_output_options, textvariable=split_duration_ms, width=6, justify=CENTER).grid(row=0, column=7, sticky=N+E+W+S)
+inside_inside_output_options.pack(expand=True, fill="both")
+
+split_reset_timestamps_checkbox = Checkbutton(inside_output_options, text="-reset_timestamps 1", variable=split_reset_timestamps)
+split_reset_timestamps_checkbox.pack(expand=True, fill="both")
+
+inside_output_options.pack(anchor=W, padx=5)
 
 # append options
 append_options_frame = LabelFrame(root, text="Append options")
@@ -280,7 +320,7 @@ append_options_frame = LabelFrame(root, text="Append options")
 append_box = Entry(append_options_frame, textvariable=append_extra)
 append_box.pack(expand=True, fill="both", padx=5, pady=5)
 
-append_options_frame.grid(row=3, column=0, columnspan=3, padx=5, sticky=N+E+W+S)
+append_options_frame.grid(row=4, column=0, columnspan=2, padx=5, sticky=N+E+W+S)
 
 # commandline groupbox
 status_frame = LabelFrame(root, text="Command line")
@@ -288,14 +328,14 @@ status_frame = LabelFrame(root, text="Command line")
 command_box = ScrolledText(status_frame, wrap=WORD, height=10)
 command_box.pack(expand=True, fill="both", padx=5, pady=5)
 
-status_frame.grid(row=4, column=0, columnspan=3, padx=5, sticky=N+E+W+S)
+status_frame.grid(row=5, column=0, columnspan=2, padx=5, sticky=N+E+W+S)
 
 # run btn and open output checkbox
 run_btn = Button(root, text="Run")
-run_btn.grid(row=5, column=0, columnspan=2, sticky=N+E+W+S, padx=5, pady=(0, 5))
+run_btn.grid(row=6, column=0, sticky=N+E+W+S, padx=5, pady=(0, 5))
 
 open_after_checkbox = Checkbutton(root, text="Open output after done", variable=open_after_done)
-open_after_checkbox.grid(row=5, column=2, padx=(0, 5), pady=(0, 5))
+open_after_checkbox.grid(row=6, column=1, padx=(0, 5), pady=(0, 5), sticky=W)
 
 # log groupbox
 log_frame = LabelFrame(root, text="Log")
@@ -303,7 +343,7 @@ log_frame = LabelFrame(root, text="Log")
 log_box = ScrolledText(log_frame, state=DISABLED, wrap=WORD)
 log_box.pack(expand=True, fill="both", padx=5, pady=5)
 
-log_frame.grid(row=1, column=3, rowspan=5, sticky=N+E+W+S, padx=5, pady=(0, 5))
+log_frame.grid(row=1, column=2, rowspan=6, sticky=N+E+W+S, padx=5, pady=(0, 5))
 
 
 def update_status(new_status):
@@ -440,6 +480,14 @@ def update_command():
 	elif audio_output.get() == 2:
 		command += " -acodec copy"
 
+	# split
+	if split_enable.get() == 1:
+		split_dur = hmsms_to_sms(split_duration_h.get(), split_duration_m.get(), split_duration_s.get(), split_duration_ms.get())
+		command += " -segment_time %f -f segment" % split_dur
+
+	if split_reset_timestamps.get():
+		command += " -reset_timestamps 1"
+
 	# jiff
 	if gif.get() == 1:
 		command += " -gifflags +transdiff"
@@ -490,7 +538,9 @@ update_command_on_change_controls = [
 	enable_time_trim,
 	gif_checkbox,
 	strict2_checkbox,
-	appendreversed_checkbox
+	appendreversed_checkbox,
+	split_enable_checkbox,
+	split_reset_timestamps_checkbox
 ]
 
 for control in update_command_on_change_controls:
@@ -514,6 +564,10 @@ update_command_on_text_change_controls = [
 	end_ms,
 	video_output,
 	audio_output,
+	split_duration_h,
+	split_duration_m,
+	split_duration_s,
+	split_duration_ms,
 	append_extra
 ]
 
