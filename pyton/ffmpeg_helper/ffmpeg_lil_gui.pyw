@@ -89,6 +89,8 @@ audio_output = IntVar(value=0)
 gif = IntVar(value=0)
 strict2 = IntVar(value=0)
 append_reversed = IntVar(value=0)
+hwaccel_cuda = IntVar(value=0)
+hwaccelout_cuda = IntVar(value=0)
 split_enable = IntVar(value=0)
 split_duration_h = IntVar(value=0)
 split_duration_m = IntVar(value=0)
@@ -278,6 +280,12 @@ strict2_checkbox.pack(expand=True, fill="both")
 appendreversed_checkbox = Checkbutton(inside_output_options, text="append reversed", variable=append_reversed)
 appendreversed_checkbox.pack(expand=True, fill="both")
 
+hwaccelcuda_checkbox = Checkbutton(inside_output_options, text="-hwaccel cuda", variable=hwaccel_cuda)
+hwaccelcuda_checkbox.pack(expand=True, fill="both")
+
+hwacceloutcuda_checkbox = Checkbutton(inside_output_options, text="-hwaccel_output_format cuda", variable=hwaccelout_cuda)
+hwacceloutcuda_checkbox.pack(expand=True, fill="both")
+
 inside_output_options.pack(anchor=W, padx=5)
 
 # split groupbox
@@ -443,6 +451,12 @@ def run_ffmpeg_thread(command):
 def update_command():
 	command = "ffmpeg -hide_banner" # it's a start
 
+	if hwaccel_cuda.get() == 1:
+		command += " -hwaccel cuda"
+
+	if hwaccelout_cuda.get() == 1:
+		command += " -hwaccel_output_format cuda"
+
 	# input file(s)
 	in_filename1 = in_txt1.get()
 	in_filename2 = in_txt2.get()
@@ -539,6 +553,8 @@ update_command_on_change_controls = [
 	gif_checkbox,
 	strict2_checkbox,
 	appendreversed_checkbox,
+	hwaccelcuda_checkbox,
+	hwacceloutcuda_checkbox,
 	split_enable_checkbox,
 	split_reset_timestamps_checkbox
 ]
